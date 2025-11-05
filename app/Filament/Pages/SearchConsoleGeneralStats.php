@@ -47,7 +47,7 @@ final class SearchConsoleGeneralStats extends Page
         $this->loadSearchConsoleData();
     }
 
-    public function getStartDate(): \Carbon\Carbon
+    public function getStartDate(): \Carbon\CarbonInterface
     {
         return match ($this->dateRangeType) {
             '24_hours' => now()->subHours(24),

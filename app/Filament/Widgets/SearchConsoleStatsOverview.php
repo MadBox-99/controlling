@@ -57,7 +57,7 @@ final class SearchConsoleStatsOverview extends StatsOverviewWidget
         return number_format($number);
     }
 
-    protected function getStartDate(): \Carbon\Carbon
+    protected function getStartDate(): \Carbon\CarbonInterface
     {
         $dateRangeType = session('search_console_date_range', '28_days');
 

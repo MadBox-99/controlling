@@ -48,7 +48,7 @@ final class TopSearchQueryModel extends Model
             ->toArray();
     }
 
-    protected function getStartDate(): \Carbon\Carbon
+    protected function getStartDate(): \Carbon\CarbonInterface
     {
         $dateRangeType = session('search_console_date_range', '28_days');
 
