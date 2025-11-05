@@ -2,6 +2,37 @@
     @vite(['resources/js/app.js', 'resources/css/app.css'])
 
     <div class="flex flex-col gap-6">
+        {{-- Date Range Filter --}}
+        <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Időszak:</span>
+            <div class="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+                <button
+                    wire:click="setDateRange('24_hours')"
+                    class="{{ $dateRangeType === '24_hours' ? 'bg-primary-600 text-white dark:bg-primary-500' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' }} px-4 py-2 text-sm font-medium transition-colors border-r border-gray-300 dark:border-gray-600"
+                >
+                    24 óra
+                </button>
+                <button
+                    wire:click="setDateRange('7_days')"
+                    class="{{ $dateRangeType === '7_days' ? 'bg-primary-600 text-white dark:bg-primary-500' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' }} px-4 py-2 text-sm font-medium transition-colors border-r border-gray-300 dark:border-gray-600"
+                >
+                    7 nap
+                </button>
+                <button
+                    wire:click="setDateRange('28_days')"
+                    class="{{ $dateRangeType === '28_days' ? 'bg-primary-600 text-white dark:bg-primary-500' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' }} px-4 py-2 text-sm font-medium transition-colors border-r border-gray-300 dark:border-gray-600"
+                >
+                    28 nap
+                </button>
+                <button
+                    wire:click="setDateRange('3_months')"
+                    class="{{ $dateRangeType === '3_months' ? 'bg-primary-600 text-white dark:bg-primary-500' : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' }} px-4 py-2 text-sm font-medium transition-colors"
+                >
+                    3 hónap
+                </button>
+            </div>
+        </div>
+
         {{-- Performance Chart --}}
         <div>
             @livewire(\App\Filament\Widgets\SearchConsoleChart::class)

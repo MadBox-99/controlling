@@ -36,12 +36,14 @@ final class SearchConsoleGeneralStats extends Page
 
     public function mount(): void
     {
+        $this->dateRangeType = session('search_console_date_range', '28_days');
         $this->loadSearchConsoleData();
     }
 
     public function setDateRange(string $type): void
     {
         $this->dateRangeType = $type;
+        session(['search_console_date_range' => $type]);
         $this->loadSearchConsoleData();
     }
 

@@ -26,11 +26,11 @@ final class TopSearchPageModel extends Model
 
     public function getRows(): array
     {
-        $thirtyDaysAgo = now()->subDays(30);
+        $startDate = $this->getStartDate();
 
         return SearchPage::query()
             ->select('page_url', DB::raw('SUM(impressions) as total_impressions'), DB::raw('SUM(clicks) as total_clicks'), DB::raw('AVG(ctr) as avg_ctr'), DB::raw('AVG(position) as avg_position'))
-            ->where('date', '>=', $thirtyDaysAgo)
+            ->where('date', '>=', $startDate)
             ->groupBy('page_url')
             ->orderByDesc('total_clicks')
             ->limit(100)
@@ -46,5 +46,18 @@ final class TopSearchPageModel extends Model
                 ];
             })
             ->toArray();
+    }
+
+    protected function getStartDate(): \Carbon\Carbon
+    {
+        $dateRangeType = session('search_console_date_range', '28_days');
+
+        return match ($dateRangeType) {
+            '24_hours' => now()->subHours(24),
+            '7_days' => now()->subDays(7),
+            '28_days' => now()->subDays(28),
+            '3_months' => now()->subMonths(3),
+            default => now()->subDays(28),
+        };
     }
 }

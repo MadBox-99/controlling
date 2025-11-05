@@ -25,11 +25,11 @@ final class DeviceBreakdownModel extends Model
 
     public function getRows(): array
     {
-        $thirtyDaysAgo = now()->subDays(30);
+        $startDate = $this->getStartDate();
 
         return SearchQuery::query()
             ->select('device', DB::raw('SUM(impressions) as total_impressions'), DB::raw('SUM(clicks) as total_clicks'), DB::raw('AVG(ctr) as avg_ctr'))
-            ->where('date', '>=', $thirtyDaysAgo)
+            ->where('date', '>=', $startDate)
             ->groupBy('device')
             ->orderByDesc('total_clicks')
             ->get()
@@ -52,6 +52,19 @@ final class DeviceBreakdownModel extends Model
             'mobile' => 'Mobil',
             'tablet' => 'Táblagép',
             default => ucfirst($device),
+        };
+    }
+
+    protected function getStartDate(): \Carbon\Carbon
+    {
+        $dateRangeType = session('search_console_date_range', '28_days');
+
+        return match ($dateRangeType) {
+            '24_hours' => now()->subHours(24),
+            '7_days' => now()->subDays(7),
+            '28_days' => now()->subDays(28),
+            '3_months' => now()->subMonths(3),
+            default => now()->subDays(28),
         };
     }
 }

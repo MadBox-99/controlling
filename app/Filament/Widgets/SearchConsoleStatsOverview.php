@@ -10,15 +10,19 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 final class SearchConsoleStatsOverview extends StatsOverviewWidget
 {
+    protected static ?string $pollingInterval = null;
+
+    protected $listeners = ['dateRangeUpdated' => '$refresh'];
+
     protected function getStats(): array
     {
-        $thirtyDaysAgo = now()->subDays(30);
+        $startDate = $this->getStartDate();
 
         $stats = [
-            'total_impressions' => SearchQuery::where('date', '>=', $thirtyDaysAgo)->sum('impressions'),
-            'total_clicks' => SearchQuery::where('date', '>=', $thirtyDaysAgo)->sum('clicks'),
-            'avg_ctr' => SearchQuery::where('date', '>=', $thirtyDaysAgo)->avg('ctr') ?? 0,
-            'avg_position' => SearchQuery::where('date', '>=', $thirtyDaysAgo)->avg('position') ?? 0,
+            'total_impressions' => SearchQuery::where('date', '>=', $startDate)->sum('impressions'),
+            'total_clicks' => SearchQuery::where('date', '>=', $startDate)->sum('clicks'),
+            'avg_ctr' => SearchQuery::where('date', '>=', $startDate)->avg('ctr') ?? 0,
+            'avg_position' => SearchQuery::where('date', '>=', $startDate)->avg('position') ?? 0,
         ];
 
         return [
@@ -51,5 +55,18 @@ final class SearchConsoleStatsOverview extends StatsOverviewWidget
         }
 
         return number_format($number);
+    }
+
+    protected function getStartDate(): \Carbon\Carbon
+    {
+        $dateRangeType = session('search_console_date_range', '28_days');
+
+        return match ($dateRangeType) {
+            '24_hours' => now()->subHours(24),
+            '7_days' => now()->subDays(7),
+            '28_days' => now()->subDays(28),
+            '3_months' => now()->subMonths(3),
+            default => now()->subDays(28),
+        };
     }
 }

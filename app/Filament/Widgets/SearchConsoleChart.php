@@ -14,11 +14,15 @@ final class SearchConsoleChart extends ChartWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    protected ?string $heading = 'Teljesítmény (Elmúlt 30 nap)';
+    protected static ?string $pollingInterval = null;
+
+    protected $listeners = ['dateRangeUpdated' => '$refresh'];
+
+    protected ?string $heading = 'Teljesítmény';
 
     protected function getData(): array
     {
-        $thirtyDaysAgo = now()->subDays(30);
+        $startDate = $this->getStartDate();
 
         // Get daily aggregated data
         $data = SearchQuery::query()
@@ -27,7 +31,7 @@ final class SearchConsoleChart extends ChartWidget
                 DB::raw('SUM(clicks) as total_clicks'),
                 DB::raw('SUM(impressions) as total_impressions')
             )
-            ->where('date', '>=', $thirtyDaysAgo)
+            ->where('date', '>=', $startDate)
             ->groupBy('day')
             ->orderBy('day', 'asc')
             ->get();
@@ -99,5 +103,18 @@ final class SearchConsoleChart extends ChartWidget
                 'mode' => 'index',
             ],
         ];
+    }
+
+    protected function getStartDate(): \Carbon\Carbon
+    {
+        $dateRangeType = session('search_console_date_range', '28_days');
+
+        return match ($dateRangeType) {
+            '24_hours' => now()->subHours(24),
+            '7_days' => now()->subDays(7),
+            '28_days' => now()->subDays(28),
+            '3_months' => now()->subMonths(3),
+            default => now()->subDays(28),
+        };
     }
 }

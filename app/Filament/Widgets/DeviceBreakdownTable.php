@@ -16,6 +16,8 @@ final class DeviceBreakdownTable extends TableWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    protected $listeners = ['dateRangeUpdated' => '$refresh'];
+
     public function table(Table $table): Table
     {
         return $table
