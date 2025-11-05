@@ -30,11 +30,11 @@ final class SearchConsoleStatsOverview extends StatsOverviewWidget
                 ->description('Elmúlt 30 nap')
                 ->color('success'),
 
-            Stat::make('Átlagos CTR', number_format($stats['avg_ctr'], 2).'%')
+            Stat::make('Átlagos CTR', number_format((float) $stats['avg_ctr'], 2).'%')
                 ->description('Click-through rate')
                 ->color('warning'),
 
-            Stat::make('Átlagos pozíció', number_format($stats['avg_position'], 1))
+            Stat::make('Átlagos pozíció', number_format((float) $stats['avg_position'], 1))
                 ->description('Keresési eredmények')
                 ->color('primary'),
         ];
