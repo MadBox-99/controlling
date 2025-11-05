@@ -6,6 +6,7 @@ namespace App\Enums;
 
 enum AnalyticsSortEnum: int
 {
+    case SearchConsoleGeneralStats = -10;
     case AnalyticsGeneralStats = -5;
     case AnalyticsStats = 0;
     case AnalyticsSession = 5;

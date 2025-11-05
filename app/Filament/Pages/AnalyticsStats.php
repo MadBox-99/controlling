@@ -49,7 +49,7 @@ final class AnalyticsStats extends Page
     {
         return [
 
-            SourcePageBreakdown::class,
+            // SourcePageBreakdown::class,
         ];
     }
 
