@@ -101,7 +101,7 @@ final class Settings extends Page
 
         $record = $this->getRecord();
 
-        if (! $record) {
+        if (! $record instanceof SettingsModel) {
             $record = new SettingsModel();
         }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Models\SearchQuery;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Sushi\Sushi;
@@ -33,19 +34,17 @@ final class DeviceBreakdownModel extends Model
             ->groupBy('device')
             ->orderByDesc('total_clicks')
             ->get()
-            ->map(function ($item, $index) {
-                return [
-                    'id' => $index + 1,
-                    'device' => $this->translateDevice($item->device),
-                    'impressions' => (int) $item->total_impressions,
-                    'clicks' => (int) $item->total_clicks,
-                    'ctr' => round((float) $item->avg_ctr, 2),
-                ];
-            })
+            ->map(fn ($item, $index): array => [
+                'id' => $index + 1,
+                'device' => $this->translateDevice($item->device),
+                'impressions' => (int) $item->total_impressions,
+                'clicks' => (int) $item->total_clicks,
+                'ctr' => round((float) $item->avg_ctr, 2),
+            ])
             ->toArray();
     }
 
-    protected function translateDevice(string $device): string
+    private function translateDevice(string $device): string
     {
         return match (mb_strtolower($device)) {
             'desktop' => 'Asztali gép',
@@ -55,7 +54,7 @@ final class DeviceBreakdownModel extends Model
         };
     }
 
-    protected function getStartDate(): \Carbon\CarbonInterface
+    private function getStartDate(): CarbonInterface
     {
         $dateRangeType = session('search_console_date_range', '28_days');
 

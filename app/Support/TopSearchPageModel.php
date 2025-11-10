@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Models\SearchPage;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Sushi\Sushi;
@@ -35,20 +36,18 @@ final class TopSearchPageModel extends Model
             ->orderByDesc('total_clicks')
             ->limit(100)
             ->get()
-            ->map(function ($item, $index) {
-                return [
-                    'id' => $index + 1,
-                    'page_url' => $item->page_url,
-                    'impressions' => (int) $item->total_impressions,
-                    'clicks' => (int) $item->total_clicks,
-                    'ctr' => round((float) $item->avg_ctr, 2),
-                    'position' => round((float) $item->avg_position, 2),
-                ];
-            })
+            ->map(fn ($item, $index): array => [
+                'id' => $index + 1,
+                'page_url' => $item->page_url,
+                'impressions' => (int) $item->total_impressions,
+                'clicks' => (int) $item->total_clicks,
+                'ctr' => round((float) $item->avg_ctr, 2),
+                'position' => round((float) $item->avg_position, 2),
+            ])
             ->toArray();
     }
 
-    protected function getStartDate(): \Carbon\CarbonInterface
+    private function getStartDate(): CarbonInterface
     {
         $dateRangeType = session('search_console_date_range', '28_days');
 

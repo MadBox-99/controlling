@@ -37,7 +37,7 @@ final class UserSourcesTable extends TableWidget
             ->paginated([10, 25, 50]);
     }
 
-    protected function getTableHeading(): ?string
+    protected function getTableHeading(): string
     {
         return 'Aktív felhasználók / Első felhasználóhoz tartozó forrás';
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\SearchQuery;
+use Carbon\CarbonInterface;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
@@ -29,7 +30,7 @@ final class SearchConsoleChart extends ChartWidget
             ->select(
                 DB::raw('DATE(date) as day'),
                 DB::raw('SUM(clicks) as total_clicks'),
-                DB::raw('SUM(impressions) as total_impressions')
+                DB::raw('SUM(impressions) as total_impressions'),
             )
             ->where('date', '>=', $startDate)
             ->groupBy('day')
@@ -41,7 +42,7 @@ final class SearchConsoleChart extends ChartWidget
         $impressions = [];
 
         foreach ($data as $row) {
-            $labels[] = date('m. d.', strtotime($row->day));
+            $labels[] = date('m. d.', strtotime((string) $row->day));
             $clicks[] = (int) $row->total_clicks;
             $impressions[] = (int) $row->total_impressions;
         }
@@ -105,7 +106,7 @@ final class SearchConsoleChart extends ChartWidget
         ];
     }
 
-    protected function getStartDate(): \Carbon\CarbonInterface
+    private function getStartDate(): CarbonInterface
     {
         $dateRangeType = session('search_console_date_range', '28_days');
 

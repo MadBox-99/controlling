@@ -13,5 +13,4 @@ enum AnalyticsSortEnum: int
     case AnalyticsPageview = 10;
     case AnalyticsEvent = 20;
     case AnalyticsConversions = 50;
-
 }

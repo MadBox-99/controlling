@@ -45,7 +45,7 @@ final class SyncSearchConsoleKpis implements ShouldQueue
         }
     }
 
-    protected function createDefaultSearchConsoleKpis(): void
+    private function createDefaultSearchConsoleKpis(): void
     {
         $searchConsoleKpis = [
             [
@@ -95,7 +95,7 @@ final class SyncSearchConsoleKpis implements ShouldQueue
         }
     }
 
-    protected function syncImpressions(Kpi $kpi): void
+    private function syncImpressions(Kpi $kpi): void
     {
         $impressions = SearchQuery::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('SUM(impressions) as total'))
@@ -107,7 +107,7 @@ final class SyncSearchConsoleKpis implements ShouldQueue
         }
     }
 
-    protected function syncClicks(Kpi $kpi): void
+    private function syncClicks(Kpi $kpi): void
     {
         $clicks = SearchQuery::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('SUM(clicks) as total'))
@@ -119,7 +119,7 @@ final class SyncSearchConsoleKpis implements ShouldQueue
         }
     }
 
-    protected function syncCtr(Kpi $kpi): void
+    private function syncCtr(Kpi $kpi): void
     {
         $ctrs = SearchQuery::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('AVG(ctr) as average'))
@@ -131,7 +131,7 @@ final class SyncSearchConsoleKpis implements ShouldQueue
         }
     }
 
-    protected function syncPosition(Kpi $kpi): void
+    private function syncPosition(Kpi $kpi): void
     {
         $positions = SearchQuery::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('AVG(position) as average'))
@@ -143,7 +143,7 @@ final class SyncSearchConsoleKpis implements ShouldQueue
         }
     }
 
-    protected function upsertKpiValue(Kpi $kpi, string $period, float|int|string $actualValue): void
+    private function upsertKpiValue(Kpi $kpi, string $period, float|int|string $actualValue): void
     {
         $kpiValue = KpiValue::query()
             ->where('kpi_id', $kpi->id)

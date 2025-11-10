@@ -34,6 +34,5 @@ final class DatabaseSeeder extends Seeder
             'site_url' => 'https://cegem360.eu',
             'last_sync_at' => now(),
         ]);
-
     }
 }

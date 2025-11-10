@@ -53,7 +53,7 @@ final class AnalyticsGeneralStats extends Page
         ];
     }
 
-    protected function loadAnalyticsData(): void
+    private function loadAnalyticsData(): void
     {
         try {
             $settings = Settings::query()->first();
@@ -70,7 +70,7 @@ final class AnalyticsGeneralStats extends Page
             $client->setAuthConfig(Storage::json($settings->google_service_account));
 
             $service = new AnalyticsData($client);
-            $propertyId = 'properties/'.$settings->property_id;
+            $propertyId = 'properties/' . $settings->property_id;
 
             // Load general stats
             $this->loadGeneralStats($service, $propertyId);
@@ -86,13 +86,12 @@ final class AnalyticsGeneralStats extends Page
 
             // Load new vs returning users
             $this->loadNewVsReturningUsers($service, $propertyId);
-
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->initializeEmptyData();
         }
     }
 
-    protected function initializeEmptyData(): void
+    private function initializeEmptyData(): void
     {
         $this->stats = [
             'active_users' => 0,
@@ -106,7 +105,7 @@ final class AnalyticsGeneralStats extends Page
         $this->newVsReturningUsers = [];
     }
 
-    protected function loadGeneralStats(AnalyticsData $service, string $propertyId): void
+    private function loadGeneralStats(AnalyticsData $service, string $propertyId): void
     {
         try {
             $dateRange = new DateRange();
@@ -135,7 +134,7 @@ final class AnalyticsGeneralStats extends Page
             } else {
                 $this->initializeEmptyData();
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->stats = [
                 'active_users' => 0,
                 'new_users' => 0,
@@ -145,7 +144,7 @@ final class AnalyticsGeneralStats extends Page
         }
     }
 
-    protected function loadTopPages(AnalyticsData $service, string $propertyId): void
+    private function loadTopPages(AnalyticsData $service, string $propertyId): void
     {
         try {
             $dateRange = new DateRange();
@@ -181,12 +180,12 @@ final class AnalyticsGeneralStats extends Page
             }
 
             $this->topPages = $pages;
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->topPages = [];
         }
     }
 
-    protected function loadUserSourcesData(AnalyticsData $service, string $propertyId): void
+    private function loadUserSourcesData(AnalyticsData $service, string $propertyId): void
     {
         try {
             $dateRange = new DateRange();
@@ -216,12 +215,12 @@ final class AnalyticsGeneralStats extends Page
             }
 
             $this->userSources = $sources;
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->userSources = [];
         }
     }
 
-    protected function loadSessionSourcesData(AnalyticsData $service, string $propertyId): void
+    private function loadSessionSourcesData(AnalyticsData $service, string $propertyId): void
     {
         try {
             $dateRange = new DateRange();
@@ -251,12 +250,12 @@ final class AnalyticsGeneralStats extends Page
             }
 
             $this->sessionSources = $sources;
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->sessionSources = [];
         }
     }
 
-    protected function loadNewVsReturningUsers(AnalyticsData $service, string $propertyId): void
+    private function loadNewVsReturningUsers(AnalyticsData $service, string $propertyId): void
     {
         try {
             $dateRange = new DateRange();
@@ -289,7 +288,7 @@ final class AnalyticsGeneralStats extends Page
             }
 
             $this->newVsReturningUsers = $data;
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->newVsReturningUsers = [];
         }
     }

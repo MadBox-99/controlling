@@ -60,8 +60,8 @@ final class SessionSourceModel extends Model
             ]);
 
             $response = $service->properties->runReport(
-                property: 'properties/'.$settings->property_id,
-                postBody: $request
+                property: 'properties/' . $settings->property_id,
+                postBody: $request,
             );
 
             $rows = [];
@@ -80,8 +80,7 @@ final class SessionSourceModel extends Model
             }
 
             return $rows;
-
-        } catch (Exception $e) {
+        } catch (Exception) {
             return [];
         }
     }

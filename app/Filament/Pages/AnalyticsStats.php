@@ -48,12 +48,11 @@ final class AnalyticsStats extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-
             // SourcePageBreakdown::class,
         ];
     }
 
-    protected function loadAnalyticsData(): void
+    private function loadAnalyticsData(): void
     {
         // Load top pages from database
         $topPagesFromDb = AnalyticsPageview::query()
@@ -63,7 +62,7 @@ final class AnalyticsStats extends Page
 
         if ($topPagesFromDb->isNotEmpty()) {
             $this->topPages = $topPagesFromDb
-                ->map(fn (AnalyticsPageview $page) => [
+                ->map(fn (AnalyticsPageview $page): array => [
                     'page_path' => $page->page_path,
                     'page_title' => $page->page_title,
                     'pageviews' => $page->pageviews,
@@ -87,7 +86,7 @@ final class AnalyticsStats extends Page
         ];
     }
 
-    protected function loadTopPagesFromApi(): void
+    private function loadTopPagesFromApi(): void
     {
         try {
             $settings = Settings::query()->first();
@@ -130,8 +129,8 @@ final class AnalyticsStats extends Page
             $request->setMetrics([$pageviewsMetric, $uniquePageviewsMetric, $bounceRateMetric]);
 
             $response = $service->properties->runReport(
-                property: 'properties/'.$settings->property_id,
-                postBody: $request
+                property: 'properties/' . $settings->property_id,
+                postBody: $request,
             );
 
             $pages = [];
@@ -153,15 +152,14 @@ final class AnalyticsStats extends Page
             }
 
             // Sort by pageviews descending and take top 10
-            usort($pages, fn ($a, $b) => $b['pageviews'] <=> $a['pageviews']);
+            usort($pages, fn (array $a, array $b): int => $b['pageviews'] <=> $a['pageviews']);
             $this->topPages = array_slice($pages, 0, 10);
-
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->topPages = [];
         }
     }
 
-    protected function loadUserSources(): void
+    private function loadUserSources(): void
     {
         try {
             $settings = Settings::query()->first();
@@ -201,8 +199,8 @@ final class AnalyticsStats extends Page
             $request->setMetrics([$sessionsMetric, $usersMetric]);
 
             $response = $service->properties->runReport(
-                property: 'properties/'.$settings->property_id,
-                postBody: $request
+                property: 'properties/' . $settings->property_id,
+                postBody: $request,
             );
 
             $sources = [];
@@ -222,10 +220,9 @@ final class AnalyticsStats extends Page
             }
 
             // Sort by sessions descending and take top 10
-            usort($sources, fn ($a, $b) => $b['sessions'] <=> $a['sessions']);
+            usort($sources, fn (array $a, array $b): int => $b['sessions'] <=> $a['sessions']);
             $this->userSources = array_slice($sources, 0, 10);
-
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->userSources = [];
         }
     }

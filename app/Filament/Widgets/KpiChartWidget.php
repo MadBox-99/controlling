@@ -38,13 +38,13 @@ final class KpiChartWidget extends Widget
     public function getSelectedKpi()
     {
         if (! $this->selectedKpiId) {
-            return null;
+            return;
         }
 
         return Kpi::query()->find($this->selectedKpiId);
     }
 
-    public function getKpiData()
+    public function getKpiData(): ?array
     {
         if (! $this->selectedKpiId) {
             return null;
@@ -84,7 +84,7 @@ final class KpiChartWidget extends Widget
         ];
     }
 
-    public function updatedSelectedKpiId($value): void
+    public function updatedSelectedKpiId(?int $value): void
     {
         $this->selectedKpiId = $value;
     }

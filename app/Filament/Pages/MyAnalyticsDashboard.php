@@ -31,7 +31,7 @@ final class MyAnalyticsDashboard extends Page
 
     protected string $view = 'filament.pages.my-analytics-dashboard';
 
-    public function getHeaderWidgetsColumns(): int|array
+    public function getHeaderWidgetsColumns(): int
     {
         return 2; // 3 oszlopos grid layout
     }

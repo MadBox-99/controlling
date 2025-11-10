@@ -7,7 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class() extends Migration
 {
     /**
      * Run the migrations.
@@ -23,7 +23,6 @@ return new class extends Migration
             $table->decimal('variance', 15, 2)->nullable();
             $table->decimal('variance_percentage', 5, 2)->nullable();
             $table->timestamps();
-
         });
     }
 

@@ -79,7 +79,7 @@ final class AnaliticsImport implements ShouldQueue
             ->send();
     }
 
-    protected function importSessions(AnalyticsData $service, string $propertyId): void
+    private function importSessions(AnalyticsData $service, string $propertyId): void
     {
         $dateRange = new DateRange();
         $dateRange->setStartDate('30daysAgo');
@@ -118,8 +118,8 @@ final class AnaliticsImport implements ShouldQueue
         $request->setMetrics([$sessionsMetric, $usersMetric, $newUsersMetric, $bounceRateMetric, $avgSessionDurationMetric]);
 
         $response = $service->properties->runReport(
-            property: 'properties/'.$propertyId,
-            postBody: $request
+            property: 'properties/' . $propertyId,
+            postBody: $request,
         );
 
         $sessionData = [];
@@ -135,7 +135,7 @@ final class AnaliticsImport implements ShouldQueue
             $bounceRate = (float) $row->getMetricValues()[3]->getValue() * 100;
             $avgDuration = (int) $row->getMetricValues()[4]->getValue();
 
-            $key = $date.'|'.$source.'|'.$medium.'|'.$campaign;
+            $key = $date . '|' . $source . '|' . $medium . '|' . $campaign;
 
             if (! isset($sessionData[$key])) {
                 $sessionData[$key] = [
@@ -192,7 +192,7 @@ final class AnaliticsImport implements ShouldQueue
         }
     }
 
-    protected function importPageviews(AnalyticsData $service, string $propertyId): void
+    private function importPageviews(AnalyticsData $service, string $propertyId): void
     {
         $dateRange = new DateRange();
         $dateRange->setStartDate('30daysAgo');
@@ -225,8 +225,8 @@ final class AnaliticsImport implements ShouldQueue
         $request->setMetrics([$pageviewsMetric, $uniquePageviewsMetric, $avgTimeMetric, $bounceRateMetric]);
 
         $response = $service->properties->runReport(
-            property: 'properties/'.$propertyId,
-            postBody: $request
+            property: 'properties/' . $propertyId,
+            postBody: $request,
         );
 
         $pageviewData = [];
@@ -240,7 +240,7 @@ final class AnaliticsImport implements ShouldQueue
             $avgTime = (int) $row->getMetricValues()[2]->getValue();
             $bounceRate = (float) $row->getMetricValues()[3]->getValue() * 100;
 
-            $key = $date.'|'.$pagePath;
+            $key = $date . '|' . $pagePath;
 
             if (! isset($pageviewData[$key])) {
                 $pageviewData[$key] = [
@@ -290,7 +290,7 @@ final class AnaliticsImport implements ShouldQueue
         }
     }
 
-    protected function importEvents(AnalyticsData $service, string $propertyId): void
+    private function importEvents(AnalyticsData $service, string $propertyId): void
     {
         $dateRange = new DateRange();
         $dateRange->setStartDate('30daysAgo');
@@ -321,8 +321,8 @@ final class AnaliticsImport implements ShouldQueue
         $request->setOrderBys([$orderBy]);
 
         $response = $service->properties->runReport(
-            property: 'properties/'.$propertyId,
-            postBody: $request
+            property: 'properties/' . $propertyId,
+            postBody: $request,
         );
 
         $eventData = [];
@@ -333,7 +333,7 @@ final class AnaliticsImport implements ShouldQueue
             $eventCount = (int) $row->getMetricValues()[0]->getValue();
             $eventValue = (float) $row->getMetricValues()[1]->getValue();
 
-            $key = $date.'|'.$eventName;
+            $key = $date . '|' . $eventName;
 
             if (! isset($eventData[$key])) {
                 $eventData[$key] = [
@@ -374,7 +374,7 @@ final class AnaliticsImport implements ShouldQueue
         }
     }
 
-    protected function importConversions(AnalyticsData $service, string $propertyId): void
+    private function importConversions(AnalyticsData $service, string $propertyId): void
     {
         $dateRange = new DateRange();
         $dateRange->setStartDate('30daysAgo');
@@ -398,8 +398,8 @@ final class AnaliticsImport implements ShouldQueue
         $request->setMetrics([$conversionsMetric, $totalRevenueMetric, $sessionsMetric]);
 
         $response = $service->properties->runReport(
-            property: 'properties/'.$propertyId,
-            postBody: $request
+            property: 'properties/' . $propertyId,
+            postBody: $request,
         );
 
         $conversionData = [];

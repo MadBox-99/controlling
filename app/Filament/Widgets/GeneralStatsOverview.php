@@ -40,7 +40,7 @@ final class GeneralStatsOverview extends StatsOverviewWidget
         ];
     }
 
-    protected function loadStats(): array
+    private function loadStats(): array
     {
         try {
             $settings = Settings::query()->first();
@@ -70,8 +70,8 @@ final class GeneralStatsOverview extends StatsOverviewWidget
             ]);
 
             $response = $service->properties->runReport(
-                property: 'properties/'.$settings->property_id,
-                postBody: $request
+                property: 'properties/' . $settings->property_id,
+                postBody: $request,
             );
 
             if ($response->getRows() && count($response->getRows()) > 0) {
@@ -86,12 +86,12 @@ final class GeneralStatsOverview extends StatsOverviewWidget
             }
 
             return $this->getEmptyStats();
-        } catch (Exception $e) {
+        } catch (Exception) {
             return $this->getEmptyStats();
         }
     }
 
-    protected function getEmptyStats(): array
+    private function getEmptyStats(): array
     {
         return [
             'active_users' => 0,
@@ -101,33 +101,33 @@ final class GeneralStatsOverview extends StatsOverviewWidget
         ];
     }
 
-    protected function formatDuration(float $seconds): string
+    private function formatDuration(float $seconds): string
     {
         if ($seconds < 60) {
-            return round($seconds).' mp';
+            return round($seconds) . ' mp';
         }
 
         $minutes = floor($seconds / 60);
         $remainingSeconds = round($seconds % 60);
 
         if ($minutes < 60) {
-            return $minutes.' p '.($remainingSeconds > 0 ? $remainingSeconds.' mp' : '');
+            return $minutes . ' p ' . ($remainingSeconds > 0 ? $remainingSeconds . ' mp' : '');
         }
 
         $hours = floor($minutes / 60);
         $remainingMinutes = $minutes % 60;
 
-        return $hours.' ó '.($remainingMinutes > 0 ? $remainingMinutes.' p' : '');
+        return $hours . ' ó ' . ($remainingMinutes > 0 ? $remainingMinutes . ' p' : '');
     }
 
-    protected function formatNumber(int $number): string
+    private function formatNumber(int $number): string
     {
         if ($number >= 1000000) {
-            return round($number / 1000000, 1).' M';
+            return round($number / 1000000, 1) . ' M';
         }
 
         if ($number >= 1000) {
-            return round($number / 1000, 1).' E';
+            return round($number / 1000, 1) . ' E';
         }
 
         return (string) $number;

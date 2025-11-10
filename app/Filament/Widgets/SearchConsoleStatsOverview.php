@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\SearchQuery;
+use Carbon\CarbonInterface;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -34,7 +35,7 @@ final class SearchConsoleStatsOverview extends StatsOverviewWidget
                 ->description('Elmúlt 30 nap')
                 ->color('success'),
 
-            Stat::make('Átlagos CTR', number_format((float) $stats['avg_ctr'], 2).'%')
+            Stat::make('Átlagos CTR', number_format((float) $stats['avg_ctr'], 2) . '%')
                 ->description('Click-through rate')
                 ->color('warning'),
 
@@ -44,20 +45,20 @@ final class SearchConsoleStatsOverview extends StatsOverviewWidget
         ];
     }
 
-    protected function formatNumber(int $number): string
+    private function formatNumber(int $number): string
     {
         if ($number >= 1000000) {
-            return round($number / 1000000, 1).' M';
+            return round($number / 1000000, 1) . ' M';
         }
 
         if ($number >= 1000) {
-            return round($number / 1000, 1).' E';
+            return round($number / 1000, 1) . ' E';
         }
 
         return number_format($number);
     }
 
-    protected function getStartDate(): \Carbon\CarbonInterface
+    private function getStartDate(): CarbonInterface
     {
         $dateRangeType = session('search_console_date_range', '28_days');
 

@@ -70,7 +70,7 @@ final class SearchConsoleImport implements ShouldQueue
             ->send();
     }
 
-    protected function importSearchQueries(SearchConsole $service, string $siteUrl): void
+    private function importSearchQueries(SearchConsole $service, string $siteUrl): void
     {
         $request = new SearchAnalyticsQueryRequest();
         $request->setStartDate(Carbon::now()->subDays(30)->format('Y-m-d'));
@@ -92,7 +92,7 @@ final class SearchConsoleImport implements ShouldQueue
             $country = $row->getKeys()[2];
             $device = $row->getKeys()[3];
 
-            $key = $date.'|'.$query.'|'.$country.'|'.$device;
+            $key = $date . '|' . $query . '|' . $country . '|' . $device;
 
             if (! isset($queryData[$key])) {
                 $queryData[$key] = [
@@ -145,7 +145,7 @@ final class SearchConsoleImport implements ShouldQueue
         }
     }
 
-    protected function importSearchPages(SearchConsole $service, string $siteUrl): void
+    private function importSearchPages(SearchConsole $service, string $siteUrl): void
     {
         $request = new SearchAnalyticsQueryRequest();
         $request->setStartDate(Carbon::now()->subDays(30)->format('Y-m-d'));
@@ -167,7 +167,7 @@ final class SearchConsoleImport implements ShouldQueue
             $country = $row->getKeys()[2];
             $device = $row->getKeys()[3];
 
-            $key = $date.'|'.$pageUrl.'|'.$country.'|'.$device;
+            $key = $date . '|' . $pageUrl . '|' . $country . '|' . $device;
 
             if (! isset($pageData[$key])) {
                 $pageData[$key] = [

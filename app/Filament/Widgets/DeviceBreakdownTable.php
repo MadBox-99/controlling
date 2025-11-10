@@ -50,7 +50,7 @@ final class DeviceBreakdownTable extends TableWidget
             ->paginated(false);
     }
 
-    protected function getTableHeading(): ?string
+    protected function getTableHeading(): string
     {
         return 'Eszközök (Elmúlt 30 nap)';
     }

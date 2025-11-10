@@ -63,7 +63,7 @@ final class SourcePageBreakdown extends TableWidget
             ->paginated([10, 25, 50, 100]);
     }
 
-    protected function getTableHeading(): ?string
+    protected function getTableHeading(): string
     {
         return 'Source & Page Breakdown (Last 30 Days)';
     }

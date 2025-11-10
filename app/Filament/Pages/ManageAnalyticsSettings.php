@@ -90,7 +90,7 @@ final class ManageAnalyticsSettings extends Page
                                 ->required()
                                 ->options(OrderByType::class)
                                 ->live()
-                                ->afterStateUpdated(fn (Set $set) => $set('order_by', '')),
+                                ->afterStateUpdated(fn (Set $set): mixed => $set('order_by', '')),
 
                             Select::make('order_by')
                                 ->label('Field')
@@ -99,21 +99,19 @@ final class ManageAnalyticsSettings extends Page
                                     $type = $get('type');
 
                                     $record = $this->getRecord();
-                                    if (! $record) {
+                                    if (! $record instanceof AnalyticsSettings) {
                                         return [];
                                     }
                                     if ($record->order_by_type === OrderByType::DIMENSION) {
                                         return collect($record->dimensions ?? [])
-                                            ->mapWithKeys(fn (array $dimension) => [$dimension['name'] => $dimension['name']])
+                                            ->mapWithKeys(fn (array $dimension): array => [$dimension['name'] => $dimension['name']])
                                             ->toArray();
                                     }
                                     if ($record->order_by_type === OrderByType::METRIC) {
                                         return collect($record->metrics ?? [])
-                                            ->mapWithKeys(fn (array $metric) => [$metric['name'] => $metric['name']])
+                                            ->mapWithKeys(fn (array $metric): array => [$metric['name'] => $metric['name']])
                                             ->toArray();
                                     }
-
-                                    return null;
                                 })
                                 ->searchable(),
                             Select::make('order_by_direction')
@@ -124,7 +122,6 @@ final class ManageAnalyticsSettings extends Page
                                     'desc' => __('Descending'),
                                 ])
                                 ->default('desc'),
-
                         ]),
                 ])
                     ->livewireSubmitHandler('save')
@@ -146,7 +143,7 @@ final class ManageAnalyticsSettings extends Page
 
         $record = $this->getRecord();
 
-        if (! $record) {
+        if (! $record instanceof AnalyticsSettings) {
             $record = new AnalyticsSettings();
         }
 

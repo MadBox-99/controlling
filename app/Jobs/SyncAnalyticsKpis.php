@@ -52,7 +52,7 @@ final class SyncAnalyticsKpis implements ShouldQueue
         }
     }
 
-    protected function createDefaultAnalyticsKpis(): void
+    private function createDefaultAnalyticsKpis(): void
     {
         $analyticsKpis = [
             [
@@ -142,7 +142,7 @@ final class SyncAnalyticsKpis implements ShouldQueue
         }
     }
 
-    protected function syncSessions(Kpi $kpi): void
+    private function syncSessions(Kpi $kpi): void
     {
         $sessions = AnalyticsSession::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('SUM(sessions) as total'))
@@ -154,7 +154,7 @@ final class SyncAnalyticsKpis implements ShouldQueue
         }
     }
 
-    protected function syncUsers(Kpi $kpi): void
+    private function syncUsers(Kpi $kpi): void
     {
         $users = AnalyticsSession::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('SUM(users) as total'))
@@ -166,7 +166,7 @@ final class SyncAnalyticsKpis implements ShouldQueue
         }
     }
 
-    protected function syncPageviews(Kpi $kpi): void
+    private function syncPageviews(Kpi $kpi): void
     {
         $pageviews = AnalyticsPageview::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('SUM(pageviews) as total'))
@@ -178,7 +178,7 @@ final class SyncAnalyticsKpis implements ShouldQueue
         }
     }
 
-    protected function syncBounceRate(Kpi $kpi): void
+    private function syncBounceRate(Kpi $kpi): void
     {
         $bounceRates = AnalyticsSession::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('AVG(bounce_rate) as average'))
@@ -190,7 +190,7 @@ final class SyncAnalyticsKpis implements ShouldQueue
         }
     }
 
-    protected function syncAvgSessionDuration(Kpi $kpi): void
+    private function syncAvgSessionDuration(Kpi $kpi): void
     {
         $durations = AnalyticsSession::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('AVG(avg_session_duration) as average'))
@@ -202,7 +202,7 @@ final class SyncAnalyticsKpis implements ShouldQueue
         }
     }
 
-    protected function syncConversionRate(Kpi $kpi): void
+    private function syncConversionRate(Kpi $kpi): void
     {
         $conversionRates = AnalyticsConversion::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('AVG(conversion_rate) as average'))
@@ -214,7 +214,7 @@ final class SyncAnalyticsKpis implements ShouldQueue
         }
     }
 
-    protected function syncConversions(Kpi $kpi): void
+    private function syncConversions(Kpi $kpi): void
     {
         $conversions = AnalyticsConversion::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('SUM(goal_completions) as total'))
@@ -226,7 +226,7 @@ final class SyncAnalyticsKpis implements ShouldQueue
         }
     }
 
-    protected function syncEvents(Kpi $kpi): void
+    private function syncEvents(Kpi $kpi): void
     {
         $events = AnalyticsEvent::query()
             ->select(DB::raw('DATE(date) as period'), DB::raw('SUM(event_count) as total'))
@@ -238,7 +238,7 @@ final class SyncAnalyticsKpis implements ShouldQueue
         }
     }
 
-    protected function upsertKpiValue(Kpi $kpi, string $period, float|int|string $actualValue): void
+    private function upsertKpiValue(Kpi $kpi, string $period, float|int|string $actualValue): void
     {
         $kpiValue = KpiValue::query()
             ->where('kpi_id', $kpi->id)

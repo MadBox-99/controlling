@@ -59,7 +59,7 @@ final class TopSearchPagesTable extends TableWidget
             ->paginated([10, 25, 50]);
     }
 
-    protected function getTableHeading(): ?string
+    protected function getTableHeading(): string
     {
         return 'Top oldalak (Elmúlt 30 nap)';
     }

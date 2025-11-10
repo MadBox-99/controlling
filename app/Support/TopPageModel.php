@@ -67,8 +67,8 @@ final class TopPageModel extends Model
             $request->setLimit(100);
 
             $response = $service->properties->runReport(
-                property: 'properties/'.$settings->property_id,
-                postBody: $request
+                property: 'properties/' . $settings->property_id,
+                postBody: $request,
             );
 
             $rows = [];
@@ -90,8 +90,7 @@ final class TopPageModel extends Model
             }
 
             return $rows;
-
-        } catch (Exception $e) {
+        } catch (Exception) {
             return [];
         }
     }

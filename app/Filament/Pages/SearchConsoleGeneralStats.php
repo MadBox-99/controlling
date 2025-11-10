@@ -6,8 +6,10 @@ namespace App\Filament\Pages;
 
 use App\Enums\AnalyticsSortEnum;
 use App\Enums\NavigationGroup;
+use App\Filament\Widgets\SearchConsoleStatsOverview;
 use App\Models\SearchPage;
 use App\Models\SearchQuery;
+use Carbon\CarbonInterface;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
 use UnitEnum;
@@ -47,7 +49,7 @@ final class SearchConsoleGeneralStats extends Page
         $this->loadSearchConsoleData();
     }
 
-    public function getStartDate(): \Carbon\CarbonInterface
+    public function getStartDate(): CarbonInterface
     {
         return match ($this->dateRangeType) {
             '24_hours' => now()->subHours(24),
@@ -61,11 +63,11 @@ final class SearchConsoleGeneralStats extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\SearchConsoleStatsOverview::class,
+            SearchConsoleStatsOverview::class,
         ];
     }
 
-    protected function loadSearchConsoleData(): void
+    private function loadSearchConsoleData(): void
     {
         $startDate = $this->getStartDate();
 
@@ -85,7 +87,7 @@ final class SearchConsoleGeneralStats extends Page
             ->orderByDesc('total_clicks')
             ->limit(10)
             ->get()
-            ->map(fn ($item) => [
+            ->map(fn ($item): array => [
                 'query' => $item->query,
                 'impressions' => (int) $item->total_impressions,
                 'clicks' => (int) $item->total_clicks,
@@ -102,7 +104,7 @@ final class SearchConsoleGeneralStats extends Page
             ->orderByDesc('total_clicks')
             ->limit(10)
             ->get()
-            ->map(fn ($item) => [
+            ->map(fn ($item): array => [
                 'page_url' => $item->page_url,
                 'impressions' => (int) $item->total_impressions,
                 'clicks' => (int) $item->total_clicks,
@@ -117,7 +119,7 @@ final class SearchConsoleGeneralStats extends Page
             ->where('date', '>=', $startDate)
             ->groupBy('device')
             ->get()
-            ->map(fn ($item) => [
+            ->map(fn ($item): array => [
                 'device' => $item->device,
                 'impressions' => (int) $item->total_impressions,
                 'clicks' => (int) $item->total_clicks,
