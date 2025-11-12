@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-final class SyncPasswordRequest extends FormRequest
+class SyncPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,13 +16,18 @@ final class SyncPasswordRequest extends FormRequest
         $apiKey = $this->bearerToken();
         $expectedApiKey = config('services.secondary_app.api_key');
 
+        // Validate API key format (8-8-8-8 hexadecimal format)
+        if ($apiKey && ! preg_match('/^[a-f0-9]{8}-[a-f0-9]{8}-[a-f0-9]{8}-[a-f0-9]{8}$/', $apiKey)) {
+            return false;
+        }
+
         return $apiKey && $expectedApiKey && $apiKey === $expectedApiKey;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

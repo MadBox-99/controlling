@@ -10,7 +10,7 @@ use function Pest\Laravel\postJson;
 
 beforeEach(function () {
     config([
-        'services.secondary_app.api_key' => 'test-api-key',
+        'services.secondary_app.api_key' => 'a1b2c3d4-e5f6a7b8-c9d0e1f2-a3b4c5d6',
     ]);
 });
 
@@ -26,7 +26,7 @@ it('successfully syncs password from secondary app', function () {
         'email' => 'test@example.com',
         'password_hash' => $newPasswordHash,
     ], [
-        'Authorization' => 'Bearer test-api-key',
+        'Authorization' => 'Bearer a1b2c3d4-e5f6a7b8-c9d0e1f2-a3b4c5d6',
     ]);
 
     $response->assertSuccessful();
@@ -53,7 +53,7 @@ it('does not trigger observer when syncing password from API', function () {
         'email' => 'test@example.com',
         'password_hash' => $newPasswordHash,
     ], [
-        'Authorization' => 'Bearer test-api-key',
+        'Authorization' => 'Bearer a1b2c3d4-e5f6a7b8-c9d0e1f2-a3b4c5d6',
     ])->assertSuccessful();
 
     Queue::assertNothingPushed();
@@ -68,7 +68,22 @@ it('requires valid api key', function () {
         'email' => 'test@example.com',
         'password_hash' => Hash::make('new-password'),
     ], [
-        'Authorization' => 'Bearer invalid-api-key',
+        'Authorization' => 'Bearer ffffffff-ffffffff-ffffffff-ffffffff',
+    ]);
+
+    $response->assertForbidden();
+});
+
+it('rejects invalid api key format', function () {
+    $user = User::factory()->create([
+        'email' => 'test@example.com',
+    ]);
+
+    $response = postJson('/api/sync-password', [
+        'email' => 'test@example.com',
+        'password_hash' => Hash::make('new-password'),
+    ], [
+        'Authorization' => 'Bearer invalid-format-key',
     ]);
 
     $response->assertForbidden();
@@ -78,7 +93,7 @@ it('requires email field', function () {
     $response = postJson('/api/sync-password', [
         'password_hash' => Hash::make('new-password'),
     ], [
-        'Authorization' => 'Bearer test-api-key',
+        'Authorization' => 'Bearer a1b2c3d4-e5f6a7b8-c9d0e1f2-a3b4c5d6',
     ]);
 
     $response->assertUnprocessable();
@@ -93,7 +108,7 @@ it('requires password_hash field', function () {
     $response = postJson('/api/sync-password', [
         'email' => 'test@example.com',
     ], [
-        'Authorization' => 'Bearer test-api-key',
+        'Authorization' => 'Bearer a1b2c3d4-e5f6a7b8-c9d0e1f2-a3b4c5d6',
     ]);
 
     $response->assertUnprocessable();
@@ -105,7 +120,7 @@ it('requires existing user email', function () {
         'email' => 'nonexistent@example.com',
         'password_hash' => Hash::make('new-password'),
     ], [
-        'Authorization' => 'Bearer test-api-key',
+        'Authorization' => 'Bearer a1b2c3d4-e5f6a7b8-c9d0e1f2-a3b4c5d6',
     ]);
 
     $response->assertUnprocessable();
@@ -121,7 +136,7 @@ it('requires password_hash to be at least 60 characters', function () {
         'email' => 'test@example.com',
         'password_hash' => 'short',
     ], [
-        'Authorization' => 'Bearer test-api-key',
+        'Authorization' => 'Bearer a1b2c3d4-e5f6a7b8-c9d0e1f2-a3b4c5d6',
     ]);
 
     $response->assertUnprocessable();
