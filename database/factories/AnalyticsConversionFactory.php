@@ -19,8 +19,17 @@ final class AnalyticsConversionFactory extends Factory
      */
     public function definition(): array
     {
+        $goalCompletions = fake()->numberBetween(1, 100);
+        $goalValue = fake()->randomFloat(2, 10, 5000);
+        $conversionRate = fake()->randomFloat(2, 0.5, 25);
+
         return [
-            //
+            'team_id' => null,
+            'date' => fake()->dateTimeBetween('-6 months', 'now')->format('Y-m-d'),
+            'goal_name' => fake()->randomElement(['Contact Form', 'Newsletter Signup', 'Purchase', 'Download', 'Registration']),
+            'goal_completions' => $goalCompletions,
+            'goal_value' => $goalValue,
+            'conversion_rate' => $conversionRate,
         ];
     }
 }

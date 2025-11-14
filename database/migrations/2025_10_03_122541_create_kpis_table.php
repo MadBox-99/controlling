@@ -19,9 +19,7 @@ return new class() extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('data_source', 50)->index();
-            $table->text('formula')->nullable();
             $table->string('category', 50)->index();
-            $table->string('format', 50);
             $table->decimal('target_value', 15, 2)->nullable();
             $table->boolean('is_active')->index()->default(true);
             $table->timestamps();

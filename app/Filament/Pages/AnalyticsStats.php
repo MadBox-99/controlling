@@ -5,11 +5,21 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Enums\AnalyticsSortEnum;
+use App\Enums\KpiGoalType;
+use App\Enums\KpiValueType;
 use App\Enums\NavigationGroup;
+use App\Filament\Resources\Kpis\KpiResource;
 use App\Models\AnalyticsPageview;
 use App\Models\AnalyticsSession;
+use App\Models\Kpi;
 use App\Models\Settings;
 use Exception;
+use Filament\Actions\Action;
+use Filament\Facades\Filament;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Google\Client;
 use Google\Service\AnalyticsData;
@@ -41,6 +51,119 @@ final class AnalyticsStats extends Page
     public function mount(): void
     {
         $this->loadAnalyticsData();
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('setKpiGoal')
+                ->label('Set KPI Goal')
+                ->slideOver()
+                ->stickyModalFooter()
+                ->schema(function (): array {
+                    $pageOptions = collect($this->topPages)->mapWithKeys(function (array $page): array {
+                        return [$page['page_path'] => "{$page['page_title']} ({$page['page_path']})"];
+                    })->toArray();
+
+                    return [
+                        Select::make('page_path')
+                            ->label('Select Analytics Page')
+                            ->options($pageOptions)
+                            ->required()
+                            ->searchable()
+                            ->helperText('Choose a page from your Google Analytics data'),
+                        Select::make('metric_type')
+                            ->label('Select Metric')
+                            ->options([
+                                'pageviews' => 'Pageviews',
+                                'unique_pageviews' => 'Unique Pageviews',
+                                'bounce_rate' => 'Bounce Rate',
+                            ])
+                            ->required()
+                            ->native(false)
+                            ->helperText('Choose which metric to track'),
+                        DatePicker::make('from_date')
+                            ->label('Start Date')
+                            ->required()
+                            ->native(false)
+                            ->displayFormat('Y-m-d')
+                            ->default(now())
+                            ->maxDate(fn ($get) => $get('target_date'))
+                            ->helperText('When to start tracking this KPI'),
+                        DatePicker::make('target_date')
+                            ->label('Target Date')
+                            ->required()
+                            ->native(false)
+                            ->displayFormat('Y-m-d')
+                            ->minDate(fn ($get) => $get('from_date') ?? now())
+                            ->helperText('When you want to achieve the target'),
+                        Select::make('goal_type')
+                            ->label('Goal Type')
+                            ->options([
+                                KpiGoalType::Increase->value => 'Increase',
+                                KpiGoalType::Decrease->value => 'Decrease',
+                            ])
+                            ->required()
+                            ->native(false),
+                        Select::make('value_type')
+                            ->label('Value Type')
+                            ->options([
+                                KpiValueType::Percentage->value => 'Percentage (%)',
+                                KpiValueType::Fixed->value => 'Fixed Number',
+                            ])
+                            ->required()
+                            ->native(false)
+                            ->live(),
+                        TextInput::make('target_value')
+                            ->label(fn ($get) => $get('value_type') === KpiValueType::Percentage->value ? 'Target Percentage (%)' : 'Target Value')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->suffix(fn ($get) => $get('value_type') === KpiValueType::Percentage->value ? '%' : null),
+                    ];
+                })
+                ->action(function (array $data): void {
+                    $pagePath = $data['page_path'];
+                    $metricType = $data['metric_type'];
+                    $kpiCode = 'analytics_' . str_replace(['/', ' '], ['_', '_'], $pagePath) . '_' . $metricType;
+
+                    $pageData = collect($this->topPages)->firstWhere('page_path', $pagePath);
+                    $pageTitle = $pageData['page_title'] ?? $pagePath;
+
+                    $kpi = Kpi::query()->updateOrCreate(
+                        [
+                            'code' => $kpiCode,
+                            'team_id' => Filament::getTenant()->id,
+                        ],
+                        [
+                            'name' => "{$pageTitle} - {$metricType}",
+                            'description' => "Track {$metricType} for {$pagePath}",
+                            'data_source' => 'analytics',
+                            'category' => 'traffic',
+                            'page_path' => $pagePath,
+                            'metric_type' => $metricType,
+                            'from_date' => $data['from_date'] ?? now(),
+                            'target_date' => $data['target_date'],
+                            'goal_type' => $data['goal_type'],
+                            'value_type' => $data['value_type'],
+                            'target_value' => $data['target_value'],
+                            'is_active' => true,
+                        ],
+                    );
+
+                    Notification::make()
+                        ->title('KPI Goal Set Successfully')
+                        ->success()
+                        ->body("Your goal for **{$kpi->name}** has been saved.")
+                        ->actions([
+                            Action::make('view')
+                                ->label('View KPI')
+                                ->url(KpiResource::getUrl('view', ['record' => $kpi->getRouteKey(), 'tenant' => Filament::getTenant()])),
+                        ])
+                        ->send();
+                })
+                ->closeModalByClickingAway(false),
+        ];
     }
 
     protected function getHeaderWidgets(): array

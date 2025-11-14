@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\EditTeamProfile;
+use App\Filament\Pages\RegisterTeam;
+use App\Http\Middleware\ApplyTenantScopes;
+use App\Models\Team;
 use BezhanSalleh\GoogleAnalytics\GoogleAnalyticsPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -32,6 +36,13 @@ final class AdminPanelServiceProvider extends PanelProvider
             ->path('admin')
             ->login(Login::class)
             ->profile()
+            ->tenant(Team::class, slugAttribute: 'slug')
+            ->tenantRegistration(RegisterTeam::class)
+            ->tenantProfile(EditTeamProfile::class)
+            ->tenantMenu(fn () => auth()->check() && (auth()->user()->isAdmin() || auth()->user()->teams()->count() > 1))
+            ->tenantMiddleware([
+                ApplyTenantScopes::class,
+            ], isPersistent: true)
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('3rem')
             ->colors([

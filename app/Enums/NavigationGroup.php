@@ -15,6 +15,7 @@ enum NavigationGroup implements HasIcon, HasLabel
     case Kpis;
     case Reports;
     case Configuration;
+    case Settings;
 
     public function getLabel(): string
     {
@@ -24,6 +25,7 @@ enum NavigationGroup implements HasIcon, HasLabel
             self::Kpis => 'KPIs',
             self::Reports => 'Reports',
             self::Configuration => 'Configuration',
+            self::Settings => 'Settings',
         };
     }
 
@@ -35,6 +37,7 @@ enum NavigationGroup implements HasIcon, HasLabel
             self::Kpis => Heroicon::OutlinedChartPie,
             self::Reports => Heroicon::OutlinedDocumentChartBar,
             self::Configuration => Heroicon::OutlinedCog6Tooth,
+            self::Settings => Heroicon::OutlinedCog,
         };
     }
 }

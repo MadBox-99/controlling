@@ -27,11 +27,7 @@ final class KpiImporter extends Importer
             ImportColumn::make('data_source')
                 ->requiredMapping()
                 ->rules(['required']),
-            ImportColumn::make('formula'),
             ImportColumn::make('category')
-                ->requiredMapping()
-                ->rules(['required']),
-            ImportColumn::make('format')
                 ->requiredMapping()
                 ->rules(['required']),
             ImportColumn::make('target_value')

@@ -20,7 +20,15 @@ final class SearchPageFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'team_id' => null,
+            'date' => fake()->date(),
+            'page_url' => fake()->url(),
+            'country' => fake()->countryCode(),
+            'device' => fake()->randomElement(['desktop', 'mobile', 'tablet']),
+            'impressions' => fake()->numberBetween(0, 10000),
+            'clicks' => fake()->numberBetween(0, 1000),
+            'ctr' => fake()->randomFloat(2, 0, 100),
+            'position' => fake()->randomFloat(2, 1, 100),
         ];
     }
 }
