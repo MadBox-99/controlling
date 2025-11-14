@@ -9,7 +9,6 @@ use App\Models\AnalyticsEvent;
 use App\Models\AnalyticsPageview;
 use App\Models\AnalyticsSession;
 use App\Models\Kpi;
-use App\Models\KpiValue;
 use App\Models\SearchPage;
 use App\Models\SearchQuery;
 use Closure;
@@ -29,7 +28,6 @@ final class ApplyTenantScopes
             // Apply global scope to all tenant-scoped models
             $models = [
                 Kpi::class,
-                KpiValue::class,
                 SearchPage::class,
                 SearchQuery::class,
                 AnalyticsPageview::class,

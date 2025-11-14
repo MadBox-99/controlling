@@ -40,9 +40,4 @@ final class PermissionResource extends Resource
             'index' => ManagePermissions::route('/'),
         ];
     }
-
-    public static function canAccess(): bool
-    {
-        return auth()->check() && auth()->user()->isAdmin();
-    }
 }

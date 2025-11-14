@@ -40,9 +40,4 @@ final class RoleResource extends Resource
             'index' => ManageRoles::route('/'),
         ];
     }
-
-    public static function canAccess(): bool
-    {
-        return auth()->check() && auth()->user()->isAdmin();
-    }
 }

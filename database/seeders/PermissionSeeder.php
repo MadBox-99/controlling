@@ -34,6 +34,18 @@ final class PermissionSeeder extends Seeder
             'update users',
             'delete users',
 
+            // Role permissions
+            'view roles',
+            'create roles',
+            'update roles',
+            'delete roles',
+
+            // Permission permissions
+            'view permissions',
+            'create permissions',
+            'update permissions',
+            'delete permissions',
+
             // KPI permissions
             'view kpis',
             'create kpis',

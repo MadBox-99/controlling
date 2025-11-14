@@ -31996,10 +31996,10 @@ namespace  {
 }
 
 
-namespace Facades\BezhanSalleh\GoogleAnalytics\Support {
+namespace Facades\Livewire\Features\SupportFileUploads {
     /**
-     * @mixin \BezhanSalleh\GoogleAnalytics\Support\GADataLookups     */
-    class GADataLookups extends \BezhanSalleh\GoogleAnalytics\Support\GADataLookups {}
+     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
+    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
 }
 
 

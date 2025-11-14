@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
+use App\Models\AnalyticsPageview;
 use App\Models\Kpi;
-use App\Models\KpiValue;
 use Filament\Widgets\Widget;
 
 final class KpiChartWidget extends Widget
@@ -56,31 +56,43 @@ final class KpiChartWidget extends Widget
             return null;
         }
 
-        // Get latest KPI value
-        $latestValue = KpiValue::query()
-            ->where('kpi_id', $this->selectedKpiId)
-            ->orderBy('period', 'desc')
-            ->first();
+        // Get current value from analytics data (latest date)
+        $currentValue = 0;
+        if ($kpi->page_path && $kpi->metric_type) {
+            $analyticsData = AnalyticsPageview::query()
+                ->where('page_path', $kpi->page_path)
+                ->latest('date')
+                ->first();
 
-        if (! $latestValue || ! $kpi->target_value) {
+            if ($analyticsData) {
+                $currentValue = (float) match ($kpi->metric_type) {
+                    'pageviews' => $analyticsData->pageviews,
+                    'unique_pageviews' => $analyticsData->unique_pageviews,
+                    'bounce_rate' => $analyticsData->bounce_rate,
+                    default => 0,
+                };
+            }
+        }
+
+        if (! $kpi->target_value) {
             return [
                 'kpi' => $kpi,
-                'latestValue' => $latestValue,
+                'currentValue' => $currentValue,
                 'achievedPercentage' => 0,
                 'remainingPercentage' => 100,
                 'isTargetMet' => false,
             ];
         }
 
-        $achievedPercentage = min(100, ($latestValue->actual_value / $kpi->target_value) * 100);
+        $achievedPercentage = min(100, ($currentValue / $kpi->target_value) * 100);
         $remainingPercentage = max(0, 100 - $achievedPercentage);
 
         return [
             'kpi' => $kpi,
-            'latestValue' => $latestValue,
+            'currentValue' => $currentValue,
             'achievedPercentage' => round($achievedPercentage, 2),
             'remainingPercentage' => round($remainingPercentage, 2),
-            'isTargetMet' => $latestValue->actual_value >= $kpi->target_value,
+            'isTargetMet' => $currentValue >= $kpi->target_value,
         ];
     }
 

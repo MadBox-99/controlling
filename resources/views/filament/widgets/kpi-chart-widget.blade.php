@@ -1,7 +1,7 @@
 <x-filament-widgets::widget>
-   
+
             @vite(['resources/css/app.css', 'resources/js/app.js'])
-        
+
     <x-filament::section>
         <div class="space-y-4">
             <!-- KPI Selector -->
@@ -21,7 +21,7 @@
                 $data = $this->getKpiData();
             @endphp
 
-            @if($data && $data['kpi']->target_value && $data['latestValue'])
+            @if($data && $data['kpi']->target_value)
                 <!-- Circular Progress Chart -->
                 <div class="flex items-center justify-center py-4">
                     <div class="relative" style="width: 180px; height: 180px;">
@@ -45,25 +45,17 @@
 
                 <!-- KPI Details -->
                 <div class="space-y-3">
-                    <div class="rounded-lg bg-blue-400 p-3 dark:bg-blue-900/30">
-                        <div class="text-xs font-semibold uppercase text-blue-900 dark:text-blue-300">Actual</div>
+                    <div class="rounded-lg bg-blue-100 p-3 dark:bg-blue-900/30">
+                        <div class="text-xs font-semibold uppercase text-blue-900 dark:text-blue-300">Current Value</div>
                         <div class="text-xl font-bold text-gray-900 dark:text-white">
-                            {{ number_format($data['latestValue']->actual_value, 2) }}{{ $data['kpi']->format === 'percentage' ? '%' : '' }}
+                            {{ number_format($data['currentValue'], 2) }}
                         </div>
                     </div>
 
                     <div class="rounded-lg bg-green-100 p-3 dark:bg-green-900/30">
                         <div class="text-xs font-semibold uppercase text-green-900 dark:text-green-300">Target</div>
                         <div class="text-xl font-bold text-gray-900 dark:text-white">
-                            {{ number_format($data['kpi']->target_value, 2) }}{{ $data['kpi']->format === 'percentage' ? '%' : '' }}
-                        </div>
-                    </div>
-
-                    <div class="rounded-lg bg-gray-700 p-3 dark:bg-gray-700">
-                        <div class="text-xs font-semibold uppercase text-gray-100 dark:text-gray-300">Variance</div>
-                        <div class="text-lg font-bold {{ $data['latestValue']->variance >= 0 ? 'text-green-300' : 'text-red-300' }}">
-                            {{ $data['latestValue']->variance >= 0 ? '+' : '' }}{{ number_format($data['latestValue']->variance, 2) }}
-                            ({{ $data['latestValue']->variance >= 0 ? '+' : '' }}{{ number_format($data['latestValue']->variance_percentage, 1) }}%)
+                            {{ number_format($data['kpi']->target_value, 2) }}
                         </div>
                     </div>
 
@@ -72,18 +64,14 @@
                             {{ $data['isTargetMet'] ? '✓ Target Met' : 'In Progress' }}
                         </span>
                     </div>
-
-                    <div class="text-center text-xs font-medium text-gray-700 dark:text-gray-400">
-                        {{ $data['latestValue']->period->format('M d, Y') }}
-                    </div>
                 </div>
-            @elseif($data && !$data['kpi']->target_value && $data['latestValue'])
-                <!-- KPI without target - show only actual value -->
+            @elseif($data && !$data['kpi']->target_value)
+                <!-- KPI without target - show only current value -->
                 <div class="space-y-3">
                     <div class="rounded-lg bg-blue-100 p-4 dark:bg-blue-900/30">
-                        <div class="text-xs font-semibold uppercase text-blue-900 dark:text-blue-300">Actual Value</div>
+                        <div class="text-xs font-semibold uppercase text-blue-900 dark:text-blue-300">Current Value</div>
                         <div class="text-3xl font-bold text-gray-900 dark:text-white">
-                            {{ number_format($data['latestValue']->actual_value, 2) }}{{ $data['kpi']->format === 'percentage' ? '%' : '' }}
+                            {{ number_format($data['currentValue'], 2) }}
                         </div>
                     </div>
 
@@ -92,14 +80,10 @@
                             ⚠️ No target value set
                         </div>
                     </div>
-
-                    <div class="text-center text-xs font-medium text-gray-700 dark:text-gray-400">
-                        {{ $data['latestValue']->period->format('M d, Y') }}
-                    </div>
                 </div>
             @else
                 <div class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                    No data available
+                    No data available. Please select a KPI with configured analytics data.
                 </div>
             @endif
         </div>
