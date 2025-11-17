@@ -60,9 +60,6 @@ final class SearchConsoleImport implements ShouldQueue
         $this->importSearchQueries($service, $settings->site_url);
         $this->importSearchPages($service, $settings->site_url);
 
-        // Sync Search Console data to KPI values
-        dispatch(new SyncSearchConsoleKpis());
-
         Notification::make()
             ->title('Search Console import completed successfully.')
             ->body('All Search Console data has been imported and KPIs have been synced.')

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Kpis\Pages;
 
 use App\Filament\Resources\Kpis\KpiResource;
-use App\Filament\Widgets\KpiChartWidget;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -17,23 +16,6 @@ final class ListKpis extends ListRecords
     {
         return [
             CreateAction::make(),
-        ];
-    }
-
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            KpiChartWidget::class,
-            KpiChartWidget::class,
-        ];
-    }
-
-    protected function getFooterWidgets(): array
-    {
-        return [
-            KpiChartWidget::class,
-            KpiChartWidget::class,
-            KpiChartWidget::class,
         ];
     }
 }

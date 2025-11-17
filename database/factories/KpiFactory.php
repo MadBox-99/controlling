@@ -26,6 +26,7 @@ final class KpiFactory extends Factory
             'description' => fake()->sentence(),
             'data_source' => fake()->randomElement(['analytics', 'search_console', 'manual', 'calculated']),
             'category' => fake()->randomElement(['traffic', 'engagement', 'conversion', 'seo', 'custom']),
+            'format' => fake()->randomElement(['number', 'percentage', 'ratio', 'duration']),
             'target_value' => fake()->randomFloat(2, 0, 10000),
             'target_date' => null,
             'from_date' => null,

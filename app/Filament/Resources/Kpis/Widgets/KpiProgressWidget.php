@@ -6,6 +6,7 @@ namespace App\Filament\Resources\Kpis\Widgets;
 
 use App\Models\AnalyticsPageview;
 use App\Models\Kpi;
+use App\Models\SearchPage;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\Model;
@@ -22,23 +23,8 @@ final class KpiProgressWidget extends BaseWidget
 
         $kpi = $this->record;
 
-        // Get current value from analytics data (latest date)
-        $currentValue = 0;
-        if ($kpi->page_path && $kpi->metric_type) {
-            $analyticsData = AnalyticsPageview::query()
-                ->where('page_path', $kpi->page_path)
-                ->latest('date')
-                ->first();
-
-            if ($analyticsData) {
-                $currentValue = (float) match ($kpi->metric_type) {
-                    'pageviews' => $analyticsData->pageviews,
-                    'unique_pageviews' => $analyticsData->unique_pageviews,
-                    'bounce_rate' => $analyticsData->bounce_rate,
-                    default => 0,
-                };
-            }
-        }
+        // Get current value based on data source
+        $currentValue = $this->getCurrentValue($kpi);
 
         $targetValue = (float) ($kpi->target_value ?? 0);
         $progress = $targetValue > 0 ? ($currentValue / $targetValue) * 100 : 0;
@@ -66,5 +52,53 @@ final class KpiProgressWidget extends BaseWidget
                 ->descriptionIcon($daysUntilTarget !== null ? ($daysUntilTarget >= 0 ? 'heroicon-o-calendar' : 'heroicon-o-exclamation-triangle') : 'heroicon-o-calendar')
                 ->color($daysUntilTarget !== null ? ($daysUntilTarget >= 0 ? 'success' : 'danger') : 'gray'),
         ];
+    }
+
+    private function getCurrentValue(Kpi $kpi): float
+    {
+        if (! $kpi->page_path && ! $kpi->metric_type) {
+            return 0;
+        }
+
+        // Search Console data
+        if ($kpi->data_source->value === 'search_console') {
+            $searchData = SearchPage::query()
+                ->where('page_url', $kpi->page_path)
+                ->latest('date')
+                ->first();
+
+            if ($searchData) {
+                return (float) match ($kpi->metric_type) {
+                    'impressions' => $searchData->impressions,
+                    'clicks' => $searchData->clicks,
+                    'ctr' => $searchData->ctr,
+                    'position' => $searchData->position,
+                    default => 0,
+                };
+            }
+
+            return 0;
+        }
+
+        // Analytics data
+        if ($kpi->data_source->value === 'analytics') {
+            $analyticsData = AnalyticsPageview::query()
+                ->where('page_path', $kpi->page_path)
+                ->latest('date')
+                ->first();
+
+            if ($analyticsData) {
+                return (float) match ($kpi->metric_type) {
+                    'pageviews' => $analyticsData->pageviews,
+                    'unique_pageviews' => $analyticsData->unique_pageviews,
+                    'bounce_rate' => $analyticsData->bounce_rate,
+                    default => 0,
+                };
+            }
+
+            return 0;
+        }
+
+        return 0;
     }
 }

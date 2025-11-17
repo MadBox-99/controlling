@@ -15,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 final class KpiForm
@@ -28,15 +29,20 @@ final class KpiForm
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('code')
-                                    ->required(),
+                                    ->required()
+                                    ->disabled(fn (string $operation) => $operation === 'edit'),
                                 TextInput::make('name')
-                                    ->required(),
+                                    ->required()
+                                    ->disabled(fn (string $operation) => $operation === 'edit'),
                                 Select::make('data_source')
                                     ->options(KpiDataSource::class)
-                                    ->required(),
+                                    ->required()
+                                    ->live()
+                                    ->disabled(fn (string $operation) => $operation === 'edit'),
                                 Select::make('category')
                                     ->options(KpiCategory::class)
-                                    ->required(),
+                                    ->required()
+                                    ->disabled(fn (string $operation) => $operation === 'edit'),
                                 Toggle::make('is_active')
                                     ->required(),
                             ]),
@@ -49,15 +55,18 @@ final class KpiForm
                             ->schema([
                                 TextInput::make('target_value')
                                     ->numeric()
-                                    ->label('Target Value'),
+                                    ->label('Target Value')
+                                    ->required(),
                                 Select::make('goal_type')
                                     ->label('Goal Type')
                                     ->options(KpiGoalType::class)
-                                    ->native(false),
+                                    ->native(false)
+                                    ->required(),
                                 Select::make('value_type')
                                     ->label('Value Type')
                                     ->options(KpiValueType::class)
-                                    ->native(false),
+                                    ->native(false)
+                                    ->required(),
                             ]),
                         Grid::make(2)
                             ->schema([
@@ -65,30 +74,60 @@ final class KpiForm
                                     ->label('Start Date')
                                     ->native(false)
                                     ->displayFormat('Y-m-d')
-                                    ->maxDate(fn ($get) => $get('target_date'))
-                                    ->helperText('When to start tracking this KPI'),
+                                    ->maxDate(fn (Get $get) => $get('target_date'))
+                                    ->helperText('When to start tracking this KPI')
+                                    ->required(),
                                 DatePicker::make('target_date')
                                     ->label('Target Date')
                                     ->native(false)
                                     ->displayFormat('Y-m-d')
-                                    ->minDate(fn ($get) => $get('from_date'))
-                                    ->helperText('When you want to achieve the target'),
+                                    ->minDate(fn (Get $get) => $get('from_date'))
+                                    ->helperText('When you want to achieve the target')
+                                    ->required(),
                             ]),
                     ]),
-                Section::make('Analytics Integration')
+                Section::make('Data Source Integration')
                     ->schema([
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('page_path')
-                                    ->label('Page Path')
-                                    ->helperText('Analytics page path being tracked'),
-                                TextInput::make('metric_type')
+                                    ->label(fn (Get $get) => match ($get('data_source')) {
+                                        'search_console' => 'Page URL',
+                                        'analytics' => 'Page Path',
+                                        default => 'Page Path / URL',
+                                    })
+                                    ->helperText(fn (Get $get) => match ($get('data_source')) {
+                                        'search_console' => 'Search Console page URL being tracked',
+                                        'analytics' => 'Analytics page path being tracked',
+                                        default => 'Page identifier',
+                                    })
+                                    ->visible(fn (Get $get) => in_array($get('data_source'), ['analytics', 'search_console']))
+                                    ->disabled(fn (string $operation) => $operation === 'edit'),
+                                Select::make('metric_type')
                                     ->label('Metric Type')
-                                    ->helperText('Analytics metric type (e.g., pageviews, bounce_rate)'),
+                                    ->options(fn (Get $get) => match ($get('data_source')) {
+                                        'search_console' => [
+                                            'impressions' => 'Impressions',
+                                            'clicks' => 'Clicks',
+                                            'ctr' => 'CTR (%)',
+                                            'position' => 'Position',
+                                        ],
+                                        'analytics' => [
+                                            'pageviews' => 'Pageviews',
+                                            'unique_pageviews' => 'Unique Pageviews',
+                                            'bounce_rate' => 'Bounce Rate',
+                                        ],
+                                        default => [],
+                                    })
+                                    ->helperText('Select the metric you want to track')
+                                    ->visible(fn (Get $get) => in_array($get('data_source'), ['analytics', 'search_console']))
+                                    ->required(fn (Get $get) => in_array($get('data_source'), ['analytics', 'search_console']))
+                                    ->disabled(fn (string $operation) => $operation === 'edit'),
                             ]),
                     ])
                     ->collapsible()
-                    ->collapsed(),
+                    ->collapsed()
+                    ->visible(fn (Get $get) => in_array($get('data_source'), ['analytics', 'search_console'])),
             ]);
     }
 }

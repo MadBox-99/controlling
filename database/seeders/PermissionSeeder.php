@@ -75,6 +75,9 @@ final class PermissionSeeder extends Seeder
             'view teams',
             'view users',
             'view kpis',
+            'create kpis',
+            'update kpis',
+            'delete kpis',
             'view analytics',
             'view search data',
         ]);

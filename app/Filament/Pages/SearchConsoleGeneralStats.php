@@ -6,12 +6,14 @@ namespace App\Filament\Pages;
 
 use App\Enums\AnalyticsSortEnum;
 use App\Enums\NavigationGroup;
+use App\Filament\Pages\Actions\SetSearchConsoleKpiGoalAction;
 use App\Filament\Widgets\SearchConsoleStatsOverview;
 use App\Models\SearchPage;
 use App\Models\SearchQuery;
 use Carbon\CarbonInterface;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use UnitEnum;
 
 final class SearchConsoleGeneralStats extends Page
@@ -38,7 +40,7 @@ final class SearchConsoleGeneralStats extends Page
 
     public function mount(): void
     {
-        $this->dateRangeType = session('search_console_date_range', '28_days');
+        $this->dateRangeType = Session::get('search_console_date_range', '28_days');
         $this->loadSearchConsoleData();
     }
 
@@ -58,6 +60,16 @@ final class SearchConsoleGeneralStats extends Page
             '3_months' => now()->subMonths(3),
             default => now()->subDays(28),
         };
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            SetSearchConsoleKpiGoalAction::make(
+                getTopPages: fn (): array => $this->topPages,
+                getTopQueries: fn (): array => $this->topQueries,
+            ),
+        ];
     }
 
     protected function getHeaderWidgets(): array

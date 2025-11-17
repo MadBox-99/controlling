@@ -35,4 +35,23 @@ final class SearchQueryFactory extends Factory
             'position' => fake()->randomFloat(2, 1, 100),
         ];
     }
+
+    /**
+     * Create a tracked query with specific text and device for time-series data.
+     */
+    public function tracked(string $queryText, string $device): static
+    {
+        $baseImpressions = rand(200, 1500);
+        $variance = rand(70, 130) / 100;
+
+        return $this->state(fn (array $attributes) => [
+            'query' => $queryText,
+            'country' => 'US',
+            'device' => $device,
+            'impressions' => (int) ($baseImpressions * $variance),
+            'clicks' => (int) ($baseImpressions * $variance * rand(3, 12) / 100),
+            'ctr' => rand(300, 1200) / 100,
+            'position' => rand(15, 80) / 10,
+        ]);
+    }
 }
