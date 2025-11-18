@@ -92,13 +92,15 @@ final class KpiForm
                                     ->native(false)
                                     ->displayFormat('Y-m-d')
                                     ->maxDate(fn (Get $get): mixed => $get('comparison_end_date'))
-                                    ->helperText('Start date for comparison period'),
+                                    ->helperText('Start date for comparison period')
+                                    ->required(),
                                 DatePicker::make('comparison_end_date')
                                     ->label('Comparison End Date')
                                     ->native(false)
                                     ->displayFormat('Y-m-d')
                                     ->minDate(fn (Get $get): mixed => $get('comparison_start_date'))
-                                    ->helperText('End date for comparison period'),
+                                    ->helperText('End date for comparison period')
+                                    ->required(),
                             ]),
                     ]),
                 Section::make('Data Source Integration')

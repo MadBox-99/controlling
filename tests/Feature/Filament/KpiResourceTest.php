@@ -65,6 +65,8 @@ it('can create kpi', function (): void {
         ->set('data.value_type', 'fixed')
         ->set('data.from_date', now()->format('Y-m-d'))
         ->set('data.target_date', now()->addMonth()->format('Y-m-d'))
+        ->set('data.comparison_start_date', now()->subMonth()->format('Y-m-d'))
+        ->set('data.comparison_end_date', now()->format('Y-m-d'))
         ->set('data.is_active', true)
         ->call('create')
         ->assertHasNoFormErrors();
@@ -88,6 +90,8 @@ it('automatically assigns team_id when creating kpi', function (): void {
         ->set('data.value_type', 'percentage')
         ->set('data.from_date', now()->format('Y-m-d'))
         ->set('data.target_date', now()->addMonth()->format('Y-m-d'))
+        ->set('data.comparison_start_date', now()->subMonth()->format('Y-m-d'))
+        ->set('data.comparison_end_date', now()->format('Y-m-d'))
         ->set('data.is_active', true)
         ->call('create')
         ->assertHasNoFormErrors();
@@ -164,6 +168,8 @@ it('non-admin users can create kpis', function (): void {
         ->set('data.value_type', 'fixed')
         ->set('data.from_date', now()->format('Y-m-d'))
         ->set('data.target_date', now()->addMonth()->format('Y-m-d'))
+        ->set('data.comparison_start_date', now()->subMonth()->format('Y-m-d'))
+        ->set('data.comparison_end_date', now()->format('Y-m-d'))
         ->set('data.is_active', true)
         ->call('create')
         ->assertHasNoFormErrors();
