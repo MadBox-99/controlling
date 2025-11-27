@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
+
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\postJson;
+
 use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
@@ -14,7 +18,7 @@ beforeEach(function () {
 
 describe('create', function () {
     it('creates a user successfully', function () {
-        $response = $this->postJson('/api/create-user', [
+        $response = postJson('/api/create-user', [
             'email' => 'test@example.com',
             'name' => 'Test User',
             'password_hash' => 'hashed_password',
@@ -24,7 +28,7 @@ describe('create', function () {
         $response->assertCreated()
             ->assertJsonStructure(['message', 'user_id']);
 
-        $this->assertDatabaseHas('users', [
+        assertDatabaseHas('users', [
             'email' => 'test@example.com',
             'name' => 'Test User',
         ]);
@@ -34,7 +38,7 @@ describe('create', function () {
     });
 
     it('returns unauthorized without api key', function () {
-        $response = $this->postJson('/api/create-user', [
+        $response = postJson('/api/create-user', [
             'email' => 'test@example.com',
             'name' => 'Test User',
             'password_hash' => 'hashed_password',
@@ -54,7 +58,7 @@ describe('create', function () {
 
         unset($data[$field]);
 
-        $response = $this->postJson('/api/create-user', $data, [
+        $response = postJson('/api/create-user', $data, [
             'Authorization' => 'Bearer test-api-key',
         ]);
 
@@ -65,7 +69,7 @@ describe('create', function () {
     it('validates email uniqueness', function () {
         User::factory()->create(['email' => 'existing@example.com']);
 
-        $response = $this->postJson('/api/create-user', [
+        $response = postJson('/api/create-user', [
             'email' => 'existing@example.com',
             'name' => 'Test User',
             'password_hash' => 'hashed_password',
@@ -77,7 +81,7 @@ describe('create', function () {
     });
 
     it('validates role values', function () {
-        $response = $this->postJson('/api/create-user', [
+        $response = postJson('/api/create-user', [
             'email' => 'test@example.com',
             'name' => 'Test User',
             'password_hash' => 'hashed_password',
@@ -96,7 +100,7 @@ describe('sync', function () {
         ]);
         $user->assignRole('subscriber');
 
-        $response = $this->postJson('/api/sync-user', [
+        $response = postJson('/api/sync-user', [
             'email' => 'user@example.com',
             'new_email' => 'updated@example.com',
             'role' => 'manager',
@@ -105,7 +109,7 @@ describe('sync', function () {
         $response->assertOk()
             ->assertJson(['message' => 'User synced successfully']);
 
-        $this->assertDatabaseHas('users', [
+        assertDatabaseHas('users', [
             'id' => $user->id,
             'email' => 'updated@example.com',
         ]);
@@ -115,7 +119,7 @@ describe('sync', function () {
     });
 
     it('returns validation error for non-existent user', function () {
-        $response = $this->postJson('/api/sync-user', [
+        $response = postJson('/api/sync-user', [
             'email' => 'nonexistent@example.com',
             'role' => 'manager',
         ], ['Authorization' => 'Bearer test-api-key']);
@@ -128,7 +132,7 @@ describe('sync', function () {
         User::factory()->create(['email' => 'existing@example.com']);
         User::factory()->create(['email' => 'user@example.com']);
 
-        $response = $this->postJson('/api/sync-user', [
+        $response = postJson('/api/sync-user', [
             'email' => 'user@example.com',
             'new_email' => 'existing@example.com',
         ], ['Authorization' => 'Bearer test-api-key']);
@@ -143,7 +147,7 @@ describe('sync', function () {
         $user = User::factory()->create(['email' => 'user@example.com']);
         $oldPassword = $user->password;
 
-        $response = $this->postJson('/api/sync-user', [
+        $response = postJson('/api/sync-user', [
             'email' => 'user@example.com',
             'password_hash' => 'new_hashed_password',
         ], ['Authorization' => 'Bearer test-api-key']);

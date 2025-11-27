@@ -9,6 +9,8 @@ use App\Http\Requests\Api\TeamCreateRequest;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 final class TeamController extends Controller
 {
@@ -33,5 +35,26 @@ final class TeamController extends Controller
             'message' => 'Team created successfully',
             'team_id' => $team->id,
         ], 201);
+    }
+
+    public function getUserTeams(Request $request): JsonResponse
+    {
+        $validated = Validator::make($request->all(), [
+            'user_email' => ['required', 'email', 'exists:users,email'],
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'errors' => $validated->errors(),
+            ], 422);
+        }
+
+        $user = User::where('email', $request->input('user_email'))->first();
+
+        $teams = $user->teams()->get(['teams.id']);
+
+        return response()->json([
+            'teams' => $teams,
+        ], 200);
     }
 }
