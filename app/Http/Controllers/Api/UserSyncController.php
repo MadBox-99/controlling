@@ -27,7 +27,7 @@ final class UserSyncController extends Controller
             Log::info('Assigning team to created user', ['email' => $user->email, 'team_id' => $teamId]);
         }
 
-        $user->teams()->attach($validated['team_ids']);
+        $user->teams()->sync($validated['team_ids']);
 
         // Bypass the hashed cast - password is already hashed
         User::where('id', $user->id)->update([
