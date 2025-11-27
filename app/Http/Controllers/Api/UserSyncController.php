@@ -9,6 +9,7 @@ use App\Http\Requests\Api\UserSyncCreateRequest;
 use App\Http\Requests\Api\UserSyncRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 final class UserSyncController extends Controller
 {
@@ -21,9 +22,11 @@ final class UserSyncController extends Controller
             'name' => $validated['name'],
             'password' => 'temporary',
         ]);
-        if (isset($validated['team_ids'])) {
-            $user->teams()->attach($validated['team_ids']);
+        foreach ($validated['team_ids'] ?? [] as $teamId) {
+            Log::info('Assigning team to created user', ['email' => $user->email, 'team_id' => $teamId]);
         }
+
+        $user->teams()->attach($validated['team_ids']);
 
         // Bypass the hashed cast - password is already hashed
         User::where('id', $user->id)->update([

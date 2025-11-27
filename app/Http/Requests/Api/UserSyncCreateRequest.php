@@ -23,8 +23,7 @@ final class UserSyncCreateRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'password_hash' => ['required', 'string'],
             'role' => ['required', 'string', 'in:subscriber,manager'],
-            'team_ids' => ['array'],
-            'team_ids.*' => ['integer', 'exists:teams,id'],
+            'team_ids' => ['sometimes'],
         ];
     }
 }
