@@ -9,12 +9,12 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
-beforeEach(function () {
+beforeEach(function (): void {
     config(['services.subscriber_api_key' => 'test-api-key']);
 });
 
-describe('create', function () {
-    it('creates a team successfully', function () {
+describe('create', function (): void {
+    it('creates a team successfully', function (): void {
         $response = postJson('/api/create-team', [
             'name' => 'Test Team',
             'slug' => 'test-team',
@@ -29,7 +29,7 @@ describe('create', function () {
         ]);
     });
 
-    it('creates a team and attaches user when email provided', function () {
+    it('creates a team and attaches user when email provided', function (): void {
         $user = User::factory()->create(['email' => 'user@example.com']);
 
         $response = postJson('/api/create-team', [
@@ -40,11 +40,11 @@ describe('create', function () {
 
         $response->assertCreated();
 
-        $team = Team::where('slug', 'test-team')->first();
+        $team = Team::query()->where('slug', 'test-team')->first();
         expect($user->teams->contains($team))->toBeTrue();
     });
 
-    it('returns unauthorized without api key', function () {
+    it('returns unauthorized without api key', function (): void {
         $response = postJson('/api/create-team', [
             'name' => 'Test Team',
             'slug' => 'test-team',
@@ -53,7 +53,7 @@ describe('create', function () {
         $response->assertUnauthorized();
     });
 
-    it('validates required fields', function (string $field) {
+    it('validates required fields', function (string $field): void {
         $data = [
             'name' => 'Test Team',
             'slug' => 'test-team',
@@ -69,7 +69,7 @@ describe('create', function () {
             ->assertJsonValidationErrors($field);
     })->with(['name', 'slug']);
 
-    it('validates slug uniqueness', function () {
+    it('validates slug uniqueness', function (): void {
         Team::factory()->create(['slug' => 'existing-slug']);
 
         $response = postJson('/api/create-team', [
@@ -81,7 +81,7 @@ describe('create', function () {
             ->assertJsonValidationErrors('slug');
     });
 
-    it('validates user_email exists', function () {
+    it('validates user_email exists', function (): void {
         $response = postJson('/api/create-team', [
             'name' => 'Test Team',
             'slug' => 'test-team',
@@ -93,8 +93,8 @@ describe('create', function () {
     });
 });
 
-describe('getUserTeams', function () {
-    it('returns teams for a user', function () {
+describe('getUserTeams', function (): void {
+    it('returns teams for a user', function (): void {
         $user = User::factory()->create(['email' => 'user@example.com']);
         $teams = Team::factory()->count(3)->create();
         $user->teams()->attach($teams);
@@ -112,7 +112,7 @@ describe('getUserTeams', function () {
             ]);
     });
 
-    it('returns empty array when user has no teams', function () {
+    it('returns empty array when user has no teams', function (): void {
         User::factory()->create(['email' => 'user@example.com']);
 
         $response = getJson('/api/user-teams?user_email=user@example.com', [
@@ -123,7 +123,7 @@ describe('getUserTeams', function () {
             ->assertJsonCount(0, 'teams');
     });
 
-    it('returns unauthorized without api key', function () {
+    it('returns unauthorized without api key', function (): void {
         User::factory()->create(['email' => 'user@example.com']);
 
         $response = getJson('/api/user-teams?user_email=user@example.com');
@@ -131,7 +131,7 @@ describe('getUserTeams', function () {
         $response->assertUnauthorized();
     });
 
-    it('validates user_email is required', function () {
+    it('validates user_email is required', function (): void {
         $response = getJson('/api/user-teams', [
             'Authorization' => 'Bearer test-api-key',
         ]);
@@ -140,7 +140,7 @@ describe('getUserTeams', function () {
             ->assertJsonValidationErrors('user_email');
     });
 
-    it('validates user_email format', function () {
+    it('validates user_email format', function (): void {
         $response = getJson('/api/user-teams?user_email=invalid-email', [
             'Authorization' => 'Bearer test-api-key',
         ]);
@@ -149,7 +149,7 @@ describe('getUserTeams', function () {
             ->assertJsonValidationErrors('user_email');
     });
 
-    it('validates user_email exists', function () {
+    it('validates user_email exists', function (): void {
         $response = getJson('/api/user-teams?user_email=nonexistent@example.com', [
             'Authorization' => 'Bearer test-api-key',
         ]);

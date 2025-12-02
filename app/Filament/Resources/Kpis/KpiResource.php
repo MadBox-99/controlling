@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Kpis;
 
 use App\Enums\NavigationGroup;
-use App\Filament\Resources\Kpis\Pages\CreateKpi;
 use App\Filament\Resources\Kpis\Pages\EditKpi;
 use App\Filament\Resources\Kpis\Pages\ListKpis;
 use App\Filament\Resources\Kpis\Pages\ViewKpi;
@@ -42,11 +41,15 @@ final class KpiResource extends Resource
         ];
     }
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListKpis::route('/'),
-            'create' => CreateKpi::route('/create'),
             'view' => ViewKpi::route('/{record}'),
             'edit' => EditKpi::route('/{record}/edit'),
         ];

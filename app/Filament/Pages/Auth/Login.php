@@ -48,11 +48,11 @@ final class Login extends BasePage
         // Debug logging
         Log::info('Login attempt', [
             'email' => $email,
-            'password_length' => mb_strlen($password),
+            'password_length' => mb_strlen((string) $password),
         ]);
 
         // Check if user exists
-        $user = User::where('email', $email)->first();
+        $user = User::query()->where('email', $email)->first();
 
         if (! $user) {
             Log::warning('Login failed: user not found', ['email' => $email]);
@@ -64,7 +64,7 @@ final class Login extends BasePage
 
         Log::info('User found', [
             'email' => $user->email,
-            'password_hash_prefix' => mb_substr($user->password, 0, 20) . '...',
+            'password_hash_prefix' => mb_substr((string) $user->password, 0, 20) . '...',
             'hash_check_result' => Hash::check($password, $user->password) ? 'MATCH' : 'NO_MATCH',
         ]);
 
@@ -105,6 +105,6 @@ final class Login extends BasePage
         session()->regenerate();
         Log::info('Login successful', ['email' => $email]);
 
-        return app(LoginResponse::class);
+        return resolve(LoginResponse::class);
     }
 }

@@ -8,14 +8,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('can be created using factory', function () {
+it('can be created using factory', function (): void {
     $settings = AnalyticsSettings::factory()->create();
 
     expect($settings)->toBeInstanceOf(AnalyticsSettings::class)
         ->and($settings->id)->toBeInt();
 });
 
-it('has correct fillable attributes', function () {
+it('has correct fillable attributes', function (): void {
     $settings = new AnalyticsSettings();
 
     expect($settings->getFillable())->toBe([
@@ -27,7 +27,7 @@ it('has correct fillable attributes', function () {
     ]);
 });
 
-it('casts dimensions to array', function () {
+it('casts dimensions to array', function (): void {
     $dimensions = ['date', 'country'];
     $settings = AnalyticsSettings::factory()->create(['dimensions' => $dimensions]);
 
@@ -35,7 +35,7 @@ it('casts dimensions to array', function () {
         ->and($settings->dimensions)->toBe($dimensions);
 });
 
-it('casts metrics to array', function () {
+it('casts metrics to array', function (): void {
     $metrics = ['sessions', 'users'];
     $settings = AnalyticsSettings::factory()->create(['metrics' => $metrics]);
 
@@ -43,7 +43,7 @@ it('casts metrics to array', function () {
         ->and($settings->metrics)->toBe($metrics);
 });
 
-it('casts order_by to array', function () {
+it('casts order_by to array', function (): void {
     $orderBy = ['sessions'];
     $settings = AnalyticsSettings::factory()->create(['order_by' => $orderBy]);
 
@@ -51,7 +51,7 @@ it('casts order_by to array', function () {
         ->and($settings->order_by)->toBe($orderBy);
 });
 
-it('casts order_by_type to enum', function () {
+it('casts order_by_type to enum', function (): void {
     $settings = AnalyticsSettings::factory()->create();
 
     expect($settings->order_by_type)->toBeInstanceOf(OrderByType::class);

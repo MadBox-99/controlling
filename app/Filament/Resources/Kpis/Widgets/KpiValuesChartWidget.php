@@ -212,13 +212,11 @@ final class KpiValuesChartWidget extends ChartWidget
                         } else {
                             $targetData[] = $value * (1 - $kpi->target_value / 100);
                         }
-                    } else {
+                    } elseif ($kpi->goal_type === 'increase') {
                         // fixed value
-                        if ($kpi->goal_type === 'increase') {
-                            $targetData[] = $value + $kpi->target_value;
-                        } else {
-                            $targetData[] = $value - $kpi->target_value;
-                        }
+                        $targetData[] = $value + $kpi->target_value;
+                    } else {
+                        $targetData[] = $value - $kpi->target_value;
                     }
                 }
 
@@ -391,13 +389,11 @@ final class KpiValuesChartWidget extends ChartWidget
                         } else {
                             $targetData[] = $value * (1 - $kpi->target_value / 100);
                         }
-                    } else {
+                    } elseif ($kpi->goal_type === 'increase') {
                         // fixed value
-                        if ($kpi->goal_type === 'increase') {
-                            $targetData[] = $value + $kpi->target_value;
-                        } else {
-                            $targetData[] = $value - $kpi->target_value;
-                        }
+                        $targetData[] = $value + $kpi->target_value;
+                    } else {
+                        $targetData[] = $value - $kpi->target_value;
                     }
                 }
 

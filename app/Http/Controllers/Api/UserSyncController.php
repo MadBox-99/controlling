@@ -30,7 +30,7 @@ final class UserSyncController extends Controller
         $user->teams()->sync($validated['team_ids']);
 
         // Bypass the hashed cast - password is already hashed
-        User::where('id', $user->id)->update([
+        User::query()->where('id', $user->id)->update([
             'password' => $validated['password_hash'],
             'email_verified_at' => now(),
         ]);
@@ -47,7 +47,7 @@ final class UserSyncController extends Controller
     {
         $validated = $request->validated();
 
-        $user = User::where('email', $validated['email'])->firstOrFail();
+        $user = User::query()->where('email', $validated['email'])->firstOrFail();
 
         $updateData = [];
 
@@ -60,7 +60,7 @@ final class UserSyncController extends Controller
 
         if ($updateData !== []) {
             // Bypass the hashed cast - password is already hashed
-            User::where('id', $user->id)->update($updateData);
+            User::query()->where('id', $user->id)->update($updateData);
         }
 
         if (isset($validated['role'])) {

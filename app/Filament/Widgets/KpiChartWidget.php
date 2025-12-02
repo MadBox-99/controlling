@@ -162,7 +162,7 @@ final class KpiChartWidget extends Widget
                 ->whereBetween('date', [$startDate, $endDate]);
 
             // For metrics that should be averaged (like bounce_rate)
-            if (in_array($kpi->metric_type, ['bounce_rate'])) {
+            if ($kpi->metric_type === 'bounce_rate') {
                 return (float) $query->avg($kpi->metric_type) ?? 0;
             }
 

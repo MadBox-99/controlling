@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\UserSyncController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('api.key')->group(function () {
+Route::middleware('api.key')->group(function (): void {
     Route::post('/create-user', [UserSyncController::class, 'create']);
     Route::post('/sync-user', [UserSyncController::class, 'sync']);
     Route::post('/create-team', [TeamController::class, 'create']);

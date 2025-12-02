@@ -15,7 +15,7 @@ return new class() extends Migration
     {
         Schema::create('settings', function (Blueprint $table): void {
             $table->id();
-            $table->json('google_service_account')->nullable();
+            $table->string('google_service_account')->nullable();
             $table->string('property_id', 100)->unique();
             $table->string('google_tag_id', 100);
             $table->string('site_url', 500)->unique();

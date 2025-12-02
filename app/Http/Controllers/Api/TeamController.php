@@ -18,14 +18,14 @@ final class TeamController extends Controller
     {
         $validated = $request->validated();
 
-        $team = Team::create([
+        $team = Team::query()->create([
             'name' => $validated['name'],
             'slug' => $validated['slug'],
         ]);
 
         // Attach user to team if email provided
         if (isset($validated['user_email'])) {
-            $user = User::where('email', $validated['user_email'])->first();
+            $user = User::query()->where('email', $validated['user_email'])->first();
             if ($user) {
                 $user->teams()->attach($team);
             }
@@ -49,7 +49,7 @@ final class TeamController extends Controller
             ], 422);
         }
 
-        $user = User::where('email', $request->input('user_email'))->first();
+        $user = User::query()->where('email', $request->input('user_email'))->first();
 
         $teams = $user->teams()->get(['teams.id']);
 

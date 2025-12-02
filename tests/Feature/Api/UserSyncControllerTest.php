@@ -10,14 +10,14 @@ use function Pest\Laravel\postJson;
 
 use Spatie\Permission\Models\Role;
 
-beforeEach(function () {
+beforeEach(function (): void {
     config(['services.subscriber_api_key' => 'test-api-key']);
     Role::findOrCreate('subscriber', 'web');
     Role::findOrCreate('manager', 'web');
 });
 
-describe('create', function () {
-    it('creates a user successfully', function () {
+describe('create', function (): void {
+    it('creates a user successfully', function (): void {
         $response = postJson('/api/create-user', [
             'email' => 'test@example.com',
             'name' => 'Test User',
@@ -33,11 +33,11 @@ describe('create', function () {
             'name' => 'Test User',
         ]);
 
-        $user = User::where('email', 'test@example.com')->first();
+        $user = User::query()->where('email', 'test@example.com')->first();
         expect($user->hasRole('subscriber'))->toBeTrue();
     });
 
-    it('returns unauthorized without api key', function () {
+    it('returns unauthorized without api key', function (): void {
         $response = postJson('/api/create-user', [
             'email' => 'test@example.com',
             'name' => 'Test User',
@@ -48,7 +48,7 @@ describe('create', function () {
         $response->assertUnauthorized();
     });
 
-    it('validates required fields', function (string $field) {
+    it('validates required fields', function (string $field): void {
         $data = [
             'email' => 'test@example.com',
             'name' => 'Test User',
@@ -66,7 +66,7 @@ describe('create', function () {
             ->assertJsonValidationErrors($field);
     })->with(['email', 'name', 'password_hash', 'role']);
 
-    it('validates email uniqueness', function () {
+    it('validates email uniqueness', function (): void {
         User::factory()->create(['email' => 'existing@example.com']);
 
         $response = postJson('/api/create-user', [
@@ -80,7 +80,7 @@ describe('create', function () {
             ->assertJsonValidationErrors('email');
     });
 
-    it('validates role values', function () {
+    it('validates role values', function (): void {
         $response = postJson('/api/create-user', [
             'email' => 'test@example.com',
             'name' => 'Test User',
@@ -93,8 +93,8 @@ describe('create', function () {
     });
 });
 
-describe('sync', function () {
-    it('syncs user data successfully', function () {
+describe('sync', function (): void {
+    it('syncs user data successfully', function (): void {
         $user = User::factory()->create([
             'email' => 'user@example.com',
         ]);
@@ -118,7 +118,7 @@ describe('sync', function () {
         expect($user->hasRole('manager'))->toBeTrue();
     });
 
-    it('returns validation error for non-existent user', function () {
+    it('returns validation error for non-existent user', function (): void {
         $response = postJson('/api/sync-user', [
             'email' => 'nonexistent@example.com',
             'role' => 'manager',
@@ -128,7 +128,7 @@ describe('sync', function () {
             ->assertJsonValidationErrors('email');
     });
 
-    it('validates new email uniqueness', function () {
+    it('validates new email uniqueness', function (): void {
         User::factory()->create(['email' => 'existing@example.com']);
         User::factory()->create(['email' => 'user@example.com']);
 
@@ -141,7 +141,7 @@ describe('sync', function () {
             ->assertJsonValidationErrors('new_email');
     });
 
-    it('updates password hash', function () {
+    it('updates password hash', function (): void {
         Http::fake();
 
         $user = User::factory()->create(['email' => 'user@example.com']);

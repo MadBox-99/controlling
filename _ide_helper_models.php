@@ -21,6 +21,8 @@ namespace App\Models{
  * @property numeric $conversion_rate
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int|null $team_id
+ * @property-read \App\Models\Team|null $team
  * @method static \Database\Factories\AnalyticsConversionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsConversion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsConversion newQuery()
@@ -32,6 +34,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsConversion whereGoalName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsConversion whereGoalValue($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsConversion whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsConversion whereTeamId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsConversion whereUpdatedAt($value)
  */
 	final class AnalyticsConversion extends \Eloquent {}
@@ -49,6 +52,8 @@ namespace App\Models{
  * @property numeric|null $event_value
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int|null $team_id
+ * @property-read \App\Models\Team|null $team
  * @method static \Database\Factories\AnalyticsEventFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsEvent newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsEvent newQuery()
@@ -62,6 +67,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsEvent whereEventName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsEvent whereEventValue($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsEvent whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsEvent whereTeamId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsEvent whereUpdatedAt($value)
  */
 	final class AnalyticsEvent extends \Eloquent {}
@@ -81,6 +87,8 @@ namespace App\Models{
  * @property numeric $exit_rate
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int|null $team_id
+ * @property-read \App\Models\Team|null $team
  * @method static \Database\Factories\AnalyticsPageviewFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsPageview newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsPageview newQuery()
@@ -95,6 +103,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsPageview wherePagePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsPageview wherePageTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsPageview wherePageviews($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsPageview whereTeamId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsPageview whereUniquePageviews($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsPageview whereUpdatedAt($value)
  */
@@ -116,6 +125,8 @@ namespace App\Models{
  * @property string|null $campaign
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int|null $team_id
+ * @property-read \App\Models\Team|null $team
  * @method static \Database\Factories\AnalyticsSessionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsSession newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsSession newQuery()
@@ -131,6 +142,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsSession wherePagesPerSession($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsSession whereSessions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsSession whereSource($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsSession whereTeamId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsSession whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AnalyticsSession whereUsers($value)
  */
@@ -170,152 +182,52 @@ namespace App\Models{
  * @property string $name
  * @property string|null $description
  * @property \App\Enums\KpiDataSource $data_source
- * @property string|null $formula
+ * @property string $source_type
  * @property \App\Enums\KpiCategory $category
- * @property \App\Enums\KpiFormat $format
- * @property numeric|null $target_value
- * @property bool $is_active
+ * @property string|null $formula
+ * @property string $format
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\KpiValue> $kpiValues
- * @property-read int|null $kpi_values_count
+ * @property numeric|null $target_value
+ * @property \Carbon\CarbonImmutable|null $target_date
+ * @property \Carbon\CarbonImmutable|null $from_date
+ * @property \Carbon\CarbonImmutable|null $comparison_start_date
+ * @property \Carbon\CarbonImmutable|null $comparison_end_date
+ * @property \App\Enums\KpiGoalType|null $goal_type
+ * @property string|null $page_path
+ * @property \App\Enums\KpiValueType|null $value_type
+ * @property string|null $metric_type
+ * @property bool $is_active
+ * @property int|null $team_id
+ * @property-read \App\Models\Team|null $team
  * @method static \Database\Factories\KpiFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereCategory($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereComparisonEndDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereComparisonStartDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereDataSource($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereFormat($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereFormula($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereFromDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereGoalType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereMetricType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi wherePagePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereSourceType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereTargetDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereTargetValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereTeamId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kpi whereValueType($value)
  */
 	final class Kpi extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * @property int $id
- * @property int $kpi_id
- * @property \Carbon\CarbonImmutable $period
- * @property numeric|null $planned_value
- * @property numeric|null $actual_value
- * @property numeric|null $variance
- * @property numeric|null $variance_percentage
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\Kpi $kpi
- * @method static \Database\Factories\KpiValueFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue whereActualValue($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue whereKpiId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue wherePeriod($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue wherePlannedValue($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue whereVariance($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|KpiValue whereVariancePercentage($value)
- */
-	final class KpiValue extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * @property int $id
- * @property int|null $user_id
- * @property string $name
- * @property string|null $description
- * @property string $type
- * @property bool $is_predefined
- * @property bool $is_public
- * @property array<array-key, mixed> $configuration
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReportExecution> $executions
- * @property-read int|null $executions_count
- * @property-read \App\Models\User|null $user
- * @method static \Database\Factories\ReportFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereConfiguration($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereIsPredefined($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereIsPublic($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereUserId($value)
- */
-	final class Report extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * @property int $id
- * @property int $report_id
- * @property int $user_id
- * @property array<array-key, mixed>|null $parameters
- * @property \Carbon\CarbonImmutable $executed_at
- * @property int $execution_time_ms
- * @property int $row_count
- * @property-read \App\Models\Report $report
- * @property-read \App\Models\User $user
- * @method static \Database\Factories\ReportExecutionFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportExecution newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportExecution newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportExecution query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportExecution whereExecutedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportExecution whereExecutionTimeMs($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportExecution whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportExecution whereParameters($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportExecution whereReportId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportExecution whereRowCount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportExecution whereUserId($value)
- */
-	final class ReportExecution extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * @property int $id
- * @property int $user_id
- * @property string $name
- * @property string|null $description
- * @property string $query_type
- * @property array<array-key, mixed>|null $parameters
- * @property array<array-key, mixed> $query_definition
- * @property bool $is_parameterized
- * @property \Carbon\CarbonImmutable|null $created_at
- * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\User $user
- * @method static \Database\Factories\SavedQueryFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery whereIsParameterized($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery whereParameters($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery whereQueryDefinition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery whereQueryType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SavedQuery whereUserId($value)
- */
-	final class SavedQuery extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -331,6 +243,8 @@ namespace App\Models{
  * @property numeric $position
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int|null $team_id
+ * @property-read \App\Models\Team|null $team
  * @method static \Database\Factories\SearchPageFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchPage newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchPage newQuery()
@@ -345,6 +259,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchPage whereImpressions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchPage wherePageUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchPage wherePosition($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchPage whereTeamId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchPage whereUpdatedAt($value)
  */
 	final class SearchPage extends \Eloquent {}
@@ -363,6 +278,8 @@ namespace App\Models{
  * @property numeric $position
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int|null $team_id
+ * @property-read \App\Models\Team|null $team
  * @method static \Database\Factories\SearchQueryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchQuery newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchQuery newQuery()
@@ -377,6 +294,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchQuery whereImpressions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchQuery wherePosition($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchQuery whereQuery($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchQuery whereTeamId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchQuery whereUpdatedAt($value)
  */
 	final class SearchQuery extends \Eloquent {}
@@ -384,6 +302,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @method static \Database\Factories\SearchSitemapFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchSitemap newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchSitemap newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SearchSitemap query()
@@ -394,7 +313,7 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property array<array-key, mixed>|null $google_service_account
+ * @property string|null $google_service_account
  * @property string $property_id
  * @property string $google_tag_id
  * @property string $site_url
@@ -421,28 +340,88 @@ namespace App\Models{
 /**
  * @property int $id
  * @property string $name
+ * @property string $slug
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AnalyticsConversion> $analyticsConversions
+ * @property-read int|null $analytics_conversions_count
+ * @property-read bool|null $analytics_conversions_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AnalyticsEvent> $analyticsEvents
+ * @property-read int|null $analytics_events_count
+ * @property-read bool|null $analytics_events_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AnalyticsPageview> $analyticsPageviews
+ * @property-read int|null $analytics_pageviews_count
+ * @property-read bool|null $analytics_pageviews_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AnalyticsSession> $analyticsSessions
+ * @property-read int|null $analytics_sessions_count
+ * @property-read bool|null $analytics_sessions_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kpi> $kpis
+ * @property-read int|null $kpis_count
+ * @property-read bool|null $kpis_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SearchPage> $searchPages
+ * @property-read int|null $search_pages_count
+ * @property-read bool|null $search_pages_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SearchQuery> $searchQueries
+ * @property-read int|null $search_queries_count
+ * @property-read bool|null $search_queries_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ * @property-read bool|null $users_exists
+ * @method static \Database\Factories\TeamFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Team newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Team newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Team query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Team whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Team whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Team whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Team whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Team whereUpdatedAt($value)
+ */
+	final class Team extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
  * @property string $email
  * @property \Carbon\CarbonImmutable|null $email_verified_at
  * @property string $password
+ * @property bool $is_active
  * @property string|null $remember_token
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read bool|null $notifications_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read bool|null $permissions_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles
+ * @property-read int|null $roles_count
+ * @property-read bool|null $roles_exists
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Team> $teams
+ * @property-read int|null $teams_count
+ * @property-read bool|null $teams_exists
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User permission($permissions, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User role($roles, $guard = null, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutPermission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutRole($roles, $guard = null)
  */
-	final class User extends \Eloquent implements \Filament\Models\Contracts\FilamentUser {}
+	final class User extends \Eloquent implements \Filament\Models\Contracts\FilamentUser, \Filament\Models\Contracts\HasTenants {}
 }
 
 namespace App\Support{

@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\SearchSitemapFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 final class SearchSitemap extends Model
 {
-    /** @use HasFactory<\Database\Factories\SearchSitemapFactory> */
+    /** @use HasFactory<SearchSitemapFactory> */
     use HasFactory;
 
     protected $fillable = [
