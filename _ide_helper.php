@@ -32105,6 +32105,11 @@ namespace  {
 }
 
 
+namespace Facades\BezhanSalleh\GoogleAnalytics\Support {
+    /**
+     * @mixin \BezhanSalleh\GoogleAnalytics\Support\GADataLookups     */
+    class GADataLookups extends \BezhanSalleh\GoogleAnalytics\Support\GADataLookups {}
+}
 
 namespace {
     

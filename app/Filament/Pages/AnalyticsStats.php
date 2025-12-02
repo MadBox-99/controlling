@@ -10,15 +10,15 @@ use App\Filament\Pages\Actions\SetAnalyticsKpiGoalAction;
 use App\Models\AnalyticsPageview;
 use App\Models\AnalyticsSession;
 use App\Models\Settings;
+use App\Services\GoogleClientFactory;
 use Exception;
 use Filament\Pages\Page;
-use Google\Client;
 use Google\Service\AnalyticsData;
 use Google\Service\AnalyticsData\DateRange;
 use Google\Service\AnalyticsData\Dimension;
 use Google\Service\AnalyticsData\Metric;
+use Google\Service\AnalyticsData\Row;
 use Google\Service\AnalyticsData\RunReportRequest;
-use Illuminate\Support\Facades\Storage;
 use UnitEnum;
 
 final class AnalyticsStats extends Page
@@ -94,142 +94,87 @@ final class AnalyticsStats extends Page
 
     private function loadTopPagesFromApi(): void
     {
-        try {
-            $settings = Settings::query()->first();
-
-            if (! $settings || ! $settings->google_service_account || ! $settings->property_id) {
-                $this->topPages = [];
-
-                return;
-            }
-
-            $client = new Client();
-            $client->useApplicationDefaultCredentials();
-            $client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);
-            $client->setAuthConfig(Storage::json($settings->google_service_account));
-
-            $service = new AnalyticsData($client);
-
-            $dateRange = new DateRange();
-            $dateRange->setStartDate('30daysAgo');
-            $dateRange->setEndDate('today');
-
-            $pagePathDimension = new Dimension();
-            $pagePathDimension->setName('pagePath');
-
-            $pageTitleDimension = new Dimension();
-            $pageTitleDimension->setName('pageTitle');
-
-            $pageviewsMetric = new Metric();
-            $pageviewsMetric->setName('screenPageViews');
-
-            $uniquePageviewsMetric = new Metric();
-            $uniquePageviewsMetric->setName('sessions');
-
-            $bounceRateMetric = new Metric();
-            $bounceRateMetric->setName('bounceRate');
-
-            $request = new RunReportRequest();
-            $request->setDateRanges([$dateRange]);
-            $request->setDimensions([$pagePathDimension, $pageTitleDimension]);
-            $request->setMetrics([$pageviewsMetric, $uniquePageviewsMetric, $bounceRateMetric]);
-
-            $response = $service->properties->runReport(
-                property: 'properties/' . $settings->property_id,
-                postBody: $request,
-            );
-
-            $pages = [];
-
-            foreach ($response->getRows() as $row) {
-                $pagePath = $row->getDimensionValues()[0]->getValue();
-                $pageTitle = $row->getDimensionValues()[1]->getValue();
-                $pageviews = (int) $row->getMetricValues()[0]->getValue();
-                $uniquePageviews = (int) $row->getMetricValues()[1]->getValue();
-                $bounceRate = (float) $row->getMetricValues()[2]->getValue() * 100;
-
-                $pages[] = [
-                    'page_path' => $pagePath,
-                    'page_title' => $pageTitle,
-                    'pageviews' => $pageviews,
-                    'unique_pageviews' => $uniquePageviews,
-                    'bounce_rate' => $bounceRate,
-                ];
-            }
-
-            // Sort by pageviews descending and take top 10
-            usort($pages, fn (array $a, array $b): int => $b['pageviews'] <=> $a['pageviews']);
-            $this->topPages = array_slice($pages, 0, 10);
-        } catch (Exception) {
-            $this->topPages = [];
-        }
+        $this->topPages = $this->runReport(
+            dimensions: ['pagePath', 'pageTitle'],
+            metrics: ['screenPageViews', 'sessions', 'bounceRate'],
+            extractRow: fn (Row $row): array => [
+                'page_path' => $row->getDimensionValues()[0]->getValue(),
+                'page_title' => $row->getDimensionValues()[1]->getValue(),
+                'pageviews' => (int) $row->getMetricValues()[0]->getValue(),
+                'unique_pageviews' => (int) $row->getMetricValues()[1]->getValue(),
+                'bounce_rate' => (float) $row->getMetricValues()[2]->getValue() * 100,
+            ],
+            sortBy: 'pageviews',
+        );
     }
 
     private function loadUserSources(): void
+    {
+        $this->userSources = $this->runReport(
+            dimensions: ['sessionSource', 'sessionMedium'],
+            metrics: ['sessions', 'activeUsers'],
+            extractRow: fn (Row $row): array => [
+                'source' => $row->getDimensionValues()[0]->getValue(),
+                'medium' => $row->getDimensionValues()[1]->getValue(),
+                'sessions' => (int) $row->getMetricValues()[0]->getValue(),
+                'users' => (int) $row->getMetricValues()[1]->getValue(),
+            ],
+            sortBy: 'sessions',
+        );
+    }
+
+    /**
+     * @param  array<string>  $dimensions
+     * @param  array<string>  $metrics
+     * @param  callable(Row): array  $extractRow
+     * @return array<array<string, mixed>>
+     */
+    private function runReport(array $dimensions, array $metrics, callable $extractRow, string $sortBy): array
     {
         try {
             $settings = Settings::query()->first();
 
             if (! $settings || ! $settings->google_service_account || ! $settings->property_id) {
-                $this->userSources = [];
-
-                return;
+                return [];
             }
 
-            $client = new Client();
-            $client->useApplicationDefaultCredentials();
-            $client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);
-            $client->setAuthConfig(Storage::json($settings->google_service_account));
-
+            $client = GoogleClientFactory::make(
+                'https://www.googleapis.com/auth/analytics.readonly',
+                $settings->google_service_account,
+            );
             $service = new AnalyticsData($client);
 
             $dateRange = new DateRange();
             $dateRange->setStartDate('30daysAgo');
             $dateRange->setEndDate('today');
 
-            $sourceDimension = new Dimension();
-            $sourceDimension->setName('sessionSource');
-
-            $mediumDimension = new Dimension();
-            $mediumDimension->setName('sessionMedium');
-
-            $sessionsMetric = new Metric();
-            $sessionsMetric->setName('sessions');
-
-            $usersMetric = new Metric();
-            $usersMetric->setName('activeUsers');
-
             $request = new RunReportRequest();
             $request->setDateRanges([$dateRange]);
-            $request->setDimensions([$sourceDimension, $mediumDimension]);
-            $request->setMetrics([$sessionsMetric, $usersMetric]);
+            $request->setDimensions(array_map(function (string $name): Dimension {
+                $dimension = new Dimension();
+                $dimension->setName($name);
+
+                return $dimension;
+            }, $dimensions));
+            $request->setMetrics(array_map(function (string $name): Metric {
+                $metric = new Metric();
+                $metric->setName($name);
+
+                return $metric;
+            }, $metrics));
 
             $response = $service->properties->runReport(
                 property: 'properties/' . $settings->property_id,
                 postBody: $request,
             );
 
-            $sources = [];
+            $rows = array_map($extractRow, $response->getRows() ?? []);
 
-            foreach ($response->getRows() as $row) {
-                $source = $row->getDimensionValues()[0]->getValue();
-                $medium = $row->getDimensionValues()[1]->getValue();
-                $sessions = (int) $row->getMetricValues()[0]->getValue();
-                $users = (int) $row->getMetricValues()[1]->getValue();
+            usort($rows, fn (array $a, array $b): int => $b[$sortBy] <=> $a[$sortBy]);
 
-                $sources[] = [
-                    'source' => $source,
-                    'medium' => $medium,
-                    'sessions' => $sessions,
-                    'users' => $users,
-                ];
-            }
-
-            // Sort by sessions descending and take top 10
-            usort($sources, fn (array $a, array $b): int => $b['sessions'] <=> $a['sessions']);
-            $this->userSources = array_slice($sources, 0, 10);
+            return array_slice($rows, 0, 10);
         } catch (Exception) {
-            $this->userSources = [];
+            return [];
         }
     }
 }

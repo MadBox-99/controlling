@@ -262,8 +262,18 @@ final class AnalyticsImport implements ShouldQueue
 
         $request = new RunReportRequest();
         $request->setDateRanges([$dateRange]);
-        $request->setDimensions(array_map(fn (string $name) => (new Dimension())->setName($name), $dimensions));
-        $request->setMetrics(array_map(fn (string $name) => (new Metric())->setName($name), $metrics));
+        $request->setDimensions(array_map(function (string $name): Dimension {
+            $dimension = new Dimension();
+            $dimension->setName($name);
+
+            return $dimension;
+        }, $dimensions));
+        $request->setMetrics(array_map(function (string $name): Metric {
+            $metric = new Metric();
+            $metric->setName($name);
+
+            return $metric;
+        }, $metrics));
 
         if ($orderByMetric) {
             $metricOrderBy = new MetricOrderBy();

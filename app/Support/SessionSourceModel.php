@@ -47,25 +47,33 @@ final class SessionSourceModel extends Model
             $dateRange->setStartDate('30daysAgo');
             $dateRange->setEndDate('today');
 
+            $dimensions = ['sessionSource', 'sessionMedium'];
+            $metrics = ['sessions'];
+
             $request = new RunReportRequest();
             $request->setDateRanges([$dateRange]);
-            $request->setDimensions([
-                (new Dimension())->setName('sessionSource'),
-                (new Dimension())->setName('sessionMedium'),
-            ]);
-            $request->setMetrics([
-                (new Metric())->setName('sessions'),
-            ]);
+            $request->setDimensions(array_map(function (string $name): Dimension {
+                $dimension = new Dimension();
+                $dimension->setName($name);
+
+                return $dimension;
+            }, $dimensions));
+            $request->setMetrics(array_map(function (string $name): Metric {
+                $metric = new Metric();
+                $metric->setName($name);
+
+                return $metric;
+            }, $metrics));
 
             $response = $service->properties->runReport(
-                property: 'properties/' . $settings->property_id,
-                postBody: $request,
+                'properties/' . $settings->property_id,
+                $request,
             );
 
             $rows = [];
             $id = 1;
 
-            foreach ($response->getRows() as $row) {
+            foreach ($response->getRows() ?? [] as $row) {
                 $dimensionValues = $row->getDimensionValues();
                 $metricValues = $row->getMetricValues();
 

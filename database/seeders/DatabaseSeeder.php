@@ -83,15 +83,17 @@ final class DatabaseSeeder extends Seeder
             'last_sync_at' => now(),
         ]);
 
-        // Seed test data using dedicated seeders
-        $this->call([
-            KpiSeeder::class,
-            AnalyticsPageviewSeeder::class,
-            AnalyticsSessionSeeder::class,
-            AnalyticsEventSeeder::class,
-            AnalyticsConversionSeeder::class,
-            SearchPageSeeder::class,
-            SearchQuerySeeder::class,
-        ]);
+        // Seed test data only in local/testing environments
+        if (app()->environment('local', 'testing')) {
+            $this->call([
+                KpiSeeder::class,
+                AnalyticsPageviewSeeder::class,
+                AnalyticsSessionSeeder::class,
+                AnalyticsEventSeeder::class,
+                AnalyticsConversionSeeder::class,
+                SearchPageSeeder::class,
+                SearchQuerySeeder::class,
+            ]);
+        }
     }
 }
