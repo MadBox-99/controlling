@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Models\Settings;
+use App\Services\GoogleClientFactory;
 use Exception;
-use Google\Client;
 use Google\Service\AnalyticsData;
 use Google\Service\AnalyticsData\DateRange;
 use Google\Service\AnalyticsData\Dimension;
 use Google\Service\AnalyticsData\Metric;
 use Google\Service\AnalyticsData\RunReportRequest;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 use Sushi\Sushi;
 
 /**
@@ -38,11 +37,10 @@ final class SessionSourceModel extends Model
                 return [];
             }
 
-            $client = new Client();
-            $client->useApplicationDefaultCredentials();
-            $client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);
-            $client->setAuthConfig(Storage::json($settings->google_service_account));
-
+            $client = GoogleClientFactory::make(
+                'https://www.googleapis.com/auth/analytics.readonly',
+                $settings->google_service_account,
+            );
             $service = new AnalyticsData($client);
 
             $dateRange = new DateRange();

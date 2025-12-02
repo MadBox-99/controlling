@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Enums\NavigationGroup;
-use App\Jobs\AnaliticsImport;
+use App\Jobs\AnalyticsImport;
 use App\Jobs\SearchConsoleImport;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -24,7 +24,7 @@ final class ManualSync extends Page
 
     public function performAnalyticsSync(): void
     {
-        dispatch(new AnaliticsImport());
+        dispatch(new AnalyticsImport());
 
         Notification::make()
             ->title('Analytics sync started successfully.')

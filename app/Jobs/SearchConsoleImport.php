@@ -7,15 +7,17 @@ namespace App\Jobs;
 use App\Models\SearchPage;
 use App\Models\SearchQuery;
 use App\Models\Settings;
+use App\Services\GoogleClientFactory;
+
+use function array_slice;
+
 use Filament\Notifications\Notification;
-use Google\Client;
 use Google\Service\SearchConsole;
 use Google\Service\SearchConsole\SearchAnalyticsQueryRequest;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Storage;
 
 final class SearchConsoleImport implements ShouldQueue
 {
@@ -50,10 +52,10 @@ final class SearchConsoleImport implements ShouldQueue
             return;
         }
 
-        $client = new Client();
-        $client->useApplicationDefaultCredentials();
-        $client->setScopes(['https://www.googleapis.com/auth/webmasters.readonly']);
-        $client->setAuthConfig(Storage::json($settings->google_service_account));
+        $client = GoogleClientFactory::make(
+            'https://www.googleapis.com/auth/webmasters.readonly',
+            $settings->google_service_account,
+        );
         $service = new SearchConsole($client);
 
         // Import Search Console data
@@ -69,151 +71,99 @@ final class SearchConsoleImport implements ShouldQueue
 
     private function importSearchQueries(SearchConsole $service, string $siteUrl): void
     {
-        $request = new SearchAnalyticsQueryRequest();
-        $request->setStartDate(Date::now()->subDays(30)->format('Y-m-d'));
-        $request->setEndDate(Date::now()->format('Y-m-d'));
-        $request->setDimensions(['date', 'query', 'country', 'device']);
-        $request->setRowLimit(25000);
-
+        $request = $this->createSearchRequest(['date', 'query', 'country', 'device']);
         $response = $service->searchanalytics->query($siteUrl, $request);
 
         if (! $response->getRows()) {
             return;
         }
 
-        $queryData = [];
+        collect($response->getRows())
+            ->groupBy(fn ($row): string => implode('|', array_slice($row->getKeys(), 0, 4)))
+            ->each(function ($rows): void {
+                $first = $rows->first();
 
-        foreach ($response->getRows() as $row) {
-            $date = $row->getKeys()[0];
-            $query = $row->getKeys()[1];
-            $country = $row->getKeys()[2];
-            $device = $row->getKeys()[3];
-
-            $key = $date . '|' . $query . '|' . $country . '|' . $device;
-
-            if (! isset($queryData[$key])) {
-                $queryData[$key] = [
-                    'date' => $date,
-                    'query' => $query,
-                    'country' => $country,
-                    'device' => $device,
-                    'impressions' => 0,
-                    'clicks' => 0,
-                    'ctr' => 0,
-                    'position' => 0,
-                    'count' => 0,
+                $values = [
+                    'impressions' => $rows->sum(fn ($r): int => (int) $r->getImpressions()),
+                    'clicks' => $rows->sum(fn ($r): int => (int) $r->getClicks()),
+                    'ctr' => $rows->avg(fn ($r): int|float => $r->getCtr() * 100),
+                    'position' => $rows->avg(fn ($r) => $r->getPosition()),
                 ];
-            }
 
-            $queryData[$key]['impressions'] += (int) $row->getImpressions();
-            $queryData[$key]['clicks'] += (int) $row->getClicks();
-            $queryData[$key]['ctr'] += $row->getCtr() * 100;
-            $queryData[$key]['position'] += $row->getPosition();
-            $queryData[$key]['count']++;
-        }
+                $record = SearchQuery::query()
+                    ->whereDate('date', $first->getKeys()[0])
+                    ->where('query', $first->getKeys()[1])
+                    ->where('country', $first->getKeys()[2])
+                    ->where('device', $first->getKeys()[3])
+                    ->first();
 
-        foreach ($queryData as $data) {
-            $record = SearchQuery::query()
-                ->whereDate('date', $data['date'])
-                ->where('query', $data['query'])
-                ->where('country', $data['country'])
-                ->where('device', $data['device'])
-                ->first();
-
-            if ($record) {
-                $record->update([
-                    'impressions' => $data['impressions'],
-                    'clicks' => $data['clicks'],
-                    'ctr' => $data['ctr'] / $data['count'],
-                    'position' => $data['position'] / $data['count'],
-                ]);
-            } else {
-                SearchQuery::query()->create([
-                    'date' => $data['date'],
-                    'query' => $data['query'],
-                    'country' => $data['country'],
-                    'device' => $data['device'],
-                    'impressions' => $data['impressions'],
-                    'clicks' => $data['clicks'],
-                    'ctr' => $data['ctr'] / $data['count'],
-                    'position' => $data['position'] / $data['count'],
-                ]);
-            }
-        }
+                if ($record) {
+                    $record->update($values);
+                } else {
+                    SearchQuery::query()->create([
+                        'date' => $first->getKeys()[0],
+                        'query' => $first->getKeys()[1],
+                        'country' => $first->getKeys()[2],
+                        'device' => $first->getKeys()[3],
+                        ...$values,
+                    ]);
+                }
+            });
     }
 
     private function importSearchPages(SearchConsole $service, string $siteUrl): void
     {
-        $request = new SearchAnalyticsQueryRequest();
-        $request->setStartDate(Date::now()->subDays(30)->format('Y-m-d'));
-        $request->setEndDate(Date::now()->format('Y-m-d'));
-        $request->setDimensions(['date', 'page', 'country', 'device']);
-        $request->setRowLimit(25000);
-
+        $request = $this->createSearchRequest(['date', 'page', 'country', 'device']);
         $response = $service->searchanalytics->query($siteUrl, $request);
 
         if (! $response->getRows()) {
             return;
         }
 
-        $pageData = [];
+        collect($response->getRows())
+            ->groupBy(fn ($row): string => implode('|', array_slice($row->getKeys(), 0, 4)))
+            ->each(function ($rows): void {
+                $first = $rows->first();
 
-        foreach ($response->getRows() as $row) {
-            $date = $row->getKeys()[0];
-            $pageUrl = $row->getKeys()[1];
-            $country = $row->getKeys()[2];
-            $device = $row->getKeys()[3];
-
-            $key = $date . '|' . $pageUrl . '|' . $country . '|' . $device;
-
-            if (! isset($pageData[$key])) {
-                $pageData[$key] = [
-                    'date' => $date,
-                    'page_url' => $pageUrl,
-                    'country' => $country,
-                    'device' => $device,
-                    'impressions' => 0,
-                    'clicks' => 0,
-                    'ctr' => 0,
-                    'position' => 0,
-                    'count' => 0,
+                $values = [
+                    'impressions' => $rows->sum(fn ($r): int => (int) $r->getImpressions()),
+                    'clicks' => $rows->sum(fn ($r): int => (int) $r->getClicks()),
+                    'ctr' => $rows->avg(fn ($r): int|float => $r->getCtr() * 100),
+                    'position' => $rows->avg(fn ($r) => $r->getPosition()),
                 ];
-            }
 
-            $pageData[$key]['impressions'] += (int) $row->getImpressions();
-            $pageData[$key]['clicks'] += (int) $row->getClicks();
-            $pageData[$key]['ctr'] += $row->getCtr() * 100;
-            $pageData[$key]['position'] += $row->getPosition();
-            $pageData[$key]['count']++;
-        }
+                $record = SearchPage::query()
+                    ->whereDate('date', $first->getKeys()[0])
+                    ->where('page_url', $first->getKeys()[1])
+                    ->where('country', $first->getKeys()[2])
+                    ->where('device', $first->getKeys()[3])
+                    ->first();
 
-        foreach ($pageData as $data) {
-            $record = SearchPage::query()
-                ->whereDate('date', $data['date'])
-                ->where('page_url', $data['page_url'])
-                ->where('country', $data['country'])
-                ->where('device', $data['device'])
-                ->first();
+                if ($record) {
+                    $record->update($values);
+                } else {
+                    SearchPage::query()->create([
+                        'date' => $first->getKeys()[0],
+                        'page_url' => $first->getKeys()[1],
+                        'country' => $first->getKeys()[2],
+                        'device' => $first->getKeys()[3],
+                        ...$values,
+                    ]);
+                }
+            });
+    }
 
-            if ($record) {
-                $record->update([
-                    'impressions' => $data['impressions'],
-                    'clicks' => $data['clicks'],
-                    'ctr' => $data['ctr'] / $data['count'],
-                    'position' => $data['position'] / $data['count'],
-                ]);
-            } else {
-                SearchPage::query()->create([
-                    'date' => $data['date'],
-                    'page_url' => $data['page_url'],
-                    'country' => $data['country'],
-                    'device' => $data['device'],
-                    'impressions' => $data['impressions'],
-                    'clicks' => $data['clicks'],
-                    'ctr' => $data['ctr'] / $data['count'],
-                    'position' => $data['position'] / $data['count'],
-                ]);
-            }
-        }
+    /**
+     * @param  array<string>  $dimensions
+     */
+    private function createSearchRequest(array $dimensions): SearchAnalyticsQueryRequest
+    {
+        $request = new SearchAnalyticsQueryRequest();
+        $request->setStartDate(Date::now()->subDays(90)->format('Y-m-d'));
+        $request->setEndDate(Date::now()->format('Y-m-d'));
+        $request->setDimensions($dimensions);
+        $request->setRowLimit(25000);
+
+        return $request;
     }
 }
