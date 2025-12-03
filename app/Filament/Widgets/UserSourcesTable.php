@@ -22,13 +22,13 @@ final class UserSourcesTable extends TableWidget
             ->query(fn (): Builder => UserSourceModel::query())
             ->columns([
                 TextColumn::make('source')
-                    ->label('Első felhasználóhoz tartozó forrás')
+                    ->label('First User Source')
                     ->searchable()
                     ->weight('bold')
                     ->description(fn (UserSourceModel $record): string => $record->medium),
 
                 TextColumn::make('users')
-                    ->label('Aktív felhasználók')
+                    ->label('Active Users')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),

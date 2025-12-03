@@ -22,32 +22,32 @@ final class TopPagesTable extends TableWidget
             ->query(fn (): Builder => TopPageModel::query())
             ->columns([
                 TextColumn::make('page_title')
-                    ->label('Oldalcím és képernyőosztály')
+                    ->label('Page Title and Screen Class')
                     ->searchable()
                     ->wrap()
                     ->weight('bold')
                     ->description(fn (TopPageModel $record): string => $record->page_path),
 
                 TextColumn::make('views')
-                    ->label('Megtekintések')
+                    ->label('Views')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),
 
                 TextColumn::make('active_users')
-                    ->label('Aktív felhasználók')
+                    ->label('Active Users')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),
 
                 TextColumn::make('event_count')
-                    ->label('Eseményszám')
+                    ->label('Event Count')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),
 
                 TextColumn::make('bounce_rate')
-                    ->label('Visszafordulási arány')
+                    ->label('Bounce Rate')
                     ->sortable()
                     ->numeric(decimalPlaces: 1)
                     ->suffix('%')

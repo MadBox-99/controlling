@@ -49,16 +49,16 @@
                         <thead class="border-b border-gray-200 dark:border-gray-700">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                    Page
+                                    {{ __('Page') }}
                                 </th>
                                 <th class="w-24 px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                    Views
+                                    {{ __('Views') }}
                                 </th>
                                 <th class="w-24 px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                    Unique
+                                    {{ __('Unique') }}
                                 </th>
                                 <th class="w-28 px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                    Bounce %
+                                    {{ __('Bounce %') }}
                                 </th>
                             </tr>
                         </thead>
@@ -66,7 +66,7 @@
                             @foreach($topPages as $page)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                                     <td class="px-6 py-4 text-sm">
-                                        <div class="font-medium text-gray-900 dark:text-gray-100">{{ $page['page_title'] ?? 'Untitled' }}</div>
+                                        <div class="font-medium text-gray-900 dark:text-gray-100">{{ $page['page_title'] ?? __('Untitled') }}</div>
                                         <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $page['page_path'] }}</div>
                                     </td>
                                     <td class="w-24 whitespace-nowrap px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -85,7 +85,7 @@
                 </div>
             @else
                 <div class="py-8 text-center text-gray-500">
-                    No page data available
+                    {{ __('No page data available') }}
                 </div>
             @endif
         </x-filament::section>
@@ -93,7 +93,7 @@
         <!-- User Sources -->
         <x-filament::section>
             <x-slot name="heading">
-                Top 10 Traffic Sources (Last 30 Days)
+                {{ __('Top 10 Traffic Sources (Last 30 Days)') }}
             </x-slot>
 
             @if(count($userSources) > 0)
@@ -102,13 +102,13 @@
                         <thead>
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                    Source / Medium
+                                    {{ __('Source / Medium') }}
                                 </th>
                                 <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                    Sessions
+                                    {{ __('Sessions') }}
                                 </th>
                                 <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                    Users
+                                    {{ __('Users') }}
                                 </th>
                             </tr>
                         </thead>
@@ -132,7 +132,7 @@
                 </div>
             @else
                 <div class="py-8 text-center text-gray-500">
-                    No traffic source data available. Check your Google Analytics API configuration.
+                    {{ __('No traffic source data available. Check your Google Analytics API configuration.') }}
                 </div>
             @endif
         </x-filament::section>

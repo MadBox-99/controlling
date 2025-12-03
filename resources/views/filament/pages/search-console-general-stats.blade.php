@@ -4,31 +4,31 @@
     <div class="flex flex-col gap-6">
         {{-- Date Range Filter --}}
         <div class="flex items-center gap-2">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Időszak:</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Period') }}:</span>
             <div class="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden shadow-sm">
                 <button
                     wire:click="setDateRange('24_hours')"
                     class="{{ $dateRangeType === '24_hours' ? 'bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-500 dark:text-gray-900' : 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' }} px-4 py-2 text-sm font-medium transition-colors border-r border-gray-300 dark:border-gray-600"
                 >
-                    24 óra
+                    {{ __('24 hours') }}
                 </button>
                 <button
                     wire:click="setDateRange('7_days')"
                     class="{{ $dateRangeType === '7_days' ? 'bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-500 dark:text-gray-900' : 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' }} px-4 py-2 text-sm font-medium transition-colors border-r border-gray-300 dark:border-gray-600"
                 >
-                    7 nap
+                    {{ __('7 days') }}
                 </button>
                 <button
                     wire:click="setDateRange('28_days')"
                     class="{{ $dateRangeType === '28_days' ? 'bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-500 dark:text-gray-900' : 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' }} px-4 py-2 text-sm font-medium transition-colors border-r border-gray-300 dark:border-gray-600"
                 >
-                    28 nap
+                    {{ __('28 days') }}
                 </button>
                 <button
                     wire:click="setDateRange('3_months')"
                     class="{{ $dateRangeType === '3_months' ? 'bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-500 dark:text-gray-900' : 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' }} px-4 py-2 text-sm font-medium transition-colors"
                 >
-                    3 hónap
+                    {{ __('3 months') }}
                 </button>
             </div>
         </div>
@@ -48,21 +48,21 @@
                         :class="activeTab === 'queries' ? 'border-primary-600 text-primary-600 dark:border-primary-500 dark:text-primary-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300'"
                         class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors"
                     >
-                        LEKÉRDEZÉSEK
+                        {{ __('Queries') }}
                     </button>
                     <button
                         @click="activeTab = 'pages'"
                         :class="activeTab === 'pages' ? 'border-primary-600 text-primary-600 dark:border-primary-500 dark:text-primary-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300'"
                         class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors"
                     >
-                        OLDALAK
+                        {{ __('Pages') }}
                     </button>
                     <button
                         @click="activeTab = 'devices'"
                         :class="activeTab === 'devices' ? 'border-primary-600 text-primary-600 dark:border-primary-500 dark:text-primary-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300'"
                         class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors"
                     >
-                        ESZKÖZÖK
+                        {{ __('Devices') }}
                     </button>
                 </nav>
             </div>

@@ -24,20 +24,20 @@ final class TopSearchPagesTable extends TableWidget
             ->query(fn (): Builder => TopSearchPageModel::query())
             ->columns([
                 TextColumn::make('page_url')
-                    ->label('Oldal URL')
+                    ->label('Page URL')
                     ->searchable()
                     ->wrap()
                     ->weight('bold')
                     ->limit(50),
 
                 TextColumn::make('impressions')
-                    ->label('Megjelenítések')
+                    ->label('Impressions')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),
 
                 TextColumn::make('clicks')
-                    ->label('Kattintások')
+                    ->label('Clicks')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),
@@ -50,7 +50,7 @@ final class TopSearchPagesTable extends TableWidget
                     ->alignEnd(),
 
                 TextColumn::make('position')
-                    ->label('Átlagos pozíció')
+                    ->label('Average Position')
                     ->sortable()
                     ->numeric(decimalPlaces: 1)
                     ->alignEnd(),

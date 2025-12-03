@@ -24,17 +24,17 @@ final class DeviceBreakdownTable extends TableWidget
             ->query(fn (): Builder => DeviceBreakdownModel::query())
             ->columns([
                 TextColumn::make('device')
-                    ->label('Eszköz')
+                    ->label('Device')
                     ->weight('bold'),
 
                 TextColumn::make('impressions')
-                    ->label('Megjelenítések')
+                    ->label('Impressions')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),
 
                 TextColumn::make('clicks')
-                    ->label('Kattintások')
+                    ->label('Clicks')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),

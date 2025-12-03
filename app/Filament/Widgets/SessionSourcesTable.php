@@ -22,13 +22,13 @@ final class SessionSourcesTable extends TableWidget
             ->query(fn (): Builder => SessionSourceModel::query())
             ->columns([
                 TextColumn::make('source')
-                    ->label('Munkamenet forrása/médium')
+                    ->label('Session Source/Medium')
                     ->searchable()
                     ->weight('bold')
                     ->description(fn (SessionSourceModel $record): string => $record->medium),
 
                 TextColumn::make('sessions')
-                    ->label('Munkamenetek')
+                    ->label('Sessions')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),

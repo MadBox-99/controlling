@@ -24,19 +24,19 @@ final class TopSearchQueriesTable extends TableWidget
             ->query(fn (): Builder => TopSearchQueryModel::query())
             ->columns([
                 TextColumn::make('query')
-                    ->label('Keresési kifejezés')
+                    ->label('Search Query')
                     ->searchable()
                     ->wrap()
                     ->weight('bold'),
 
                 TextColumn::make('impressions')
-                    ->label('Megjelenítések')
+                    ->label('Impressions')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),
 
                 TextColumn::make('clicks')
-                    ->label('Kattintások')
+                    ->label('Clicks')
                     ->sortable()
                     ->numeric()
                     ->alignEnd(),
@@ -49,7 +49,7 @@ final class TopSearchQueriesTable extends TableWidget
                     ->alignEnd(),
 
                 TextColumn::make('position')
-                    ->label('Átlagos pozíció')
+                    ->label('Average Position')
                     ->sortable()
                     ->numeric(decimalPlaces: 1)
                     ->alignEnd(),

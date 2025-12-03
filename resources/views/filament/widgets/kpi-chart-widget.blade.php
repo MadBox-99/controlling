@@ -10,7 +10,7 @@
                     wire:model.live="selectedKpiId"
                     class="w-full rounded-md border-2 border-blue-300 bg-blue-50 px-4 py-3 text-base font-medium text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-blue-600 dark:bg-blue-900/30 dark:text-white"
                 >
-                    <option value="">Select KPI...</option>
+                    <option value="">{{ __('Select KPI...') }}</option>
                     @foreach($this->getKpis() as $kpi)
                         <option value="{{ $kpi->id }}">{{ $kpi->name }}</option>
                     @endforeach
@@ -38,7 +38,7 @@
                             <div class="text-3xl font-bold {{ $data['isTargetMet'] ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400' }}">
                                 {{ $data['achievedPercentage'] }}%
                             </div>
-                            <div class="text-xs text-gray-600 dark:text-gray-400">Achieved</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400">{{ __('Achieved') }}</div>
                         </div>
                     </div>
                 </div>
@@ -46,14 +46,14 @@
                 <!-- KPI Details -->
                 <div class="space-y-3">
                     <div class="rounded-lg bg-blue-100 p-3 dark:bg-blue-900/30">
-                        <div class="text-xs font-semibold uppercase text-blue-900 dark:text-blue-300">Current Value</div>
+                        <div class="text-xs font-semibold uppercase text-blue-900 dark:text-blue-300">{{ __('Current Value') }}</div>
                         <div class="text-xl font-bold text-gray-900 dark:text-white">
                             {{ number_format($data['currentValue'], 2, ',', ' ') }}
                         </div>
                     </div>
 
                     <div class="rounded-lg bg-green-100 p-3 dark:bg-green-900/30">
-                        <div class="text-xs font-semibold uppercase text-green-900 dark:text-green-300">Target</div>
+                        <div class="text-xs font-semibold uppercase text-green-900 dark:text-green-300">{{ __('Target') }}</div>
                         <div class="text-xl font-bold text-gray-900 dark:text-white">
                             {{ number_format($data['kpi']->target_value, 2, ',', ' ') }}
                         </div>
@@ -61,7 +61,7 @@
 
                     <div class="flex items-center justify-center rounded-lg border-2 p-3 {{ $data['isTargetMet'] ? 'border-green-600 bg-green-100 dark:border-green-700 dark:bg-green-900/30' : 'border-blue-600 bg-blue-100 dark:border-blue-700 dark:bg-blue-900/30' }}">
                         <span class="text-sm font-bold {{ $data['isTargetMet'] ? 'text-green-900 dark:text-green-200' : 'text-blue-900 dark:text-blue-200' }}">
-                            {{ $data['isTargetMet'] ? '✓ Target Met' : 'In Progress' }}
+                            {{ $data['isTargetMet'] ? '✓ ' . __('Target Met') : __('In Progress') }}
                         </span>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                 <!-- KPI without target - show only current value -->
                 <div class="space-y-3">
                     <div class="rounded-lg bg-blue-100 p-4 dark:bg-blue-900/30">
-                        <div class="text-xs font-semibold uppercase text-blue-900 dark:text-blue-300">Current Value</div>
+                        <div class="text-xs font-semibold uppercase text-blue-900 dark:text-blue-300">{{ __('Current Value') }}</div>
                         <div class="text-3xl font-bold text-gray-900 dark:text-white">
                             {{ number_format($data['currentValue'], 2, ',', ' ') }}
                         </div>
@@ -77,13 +77,13 @@
 
                     <div class="rounded-lg border-2 border-yellow-400 bg-yellow-50 p-3 dark:border-yellow-600 dark:bg-yellow-900/20">
                         <div class="text-center text-sm font-semibold text-yellow-800 dark:text-yellow-200">
-                            ⚠️ No target value set
+                            ⚠️ {{ __('No target value set') }}
                         </div>
                     </div>
                 </div>
             @else
                 <div class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                    No data available. Please select a KPI with configured analytics data.
+                    {{ __('No data available. Please select a KPI with configured analytics data.') }}
                 </div>
             @endif
         </div>
