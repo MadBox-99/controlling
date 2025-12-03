@@ -24,6 +24,16 @@ final class KpiResource extends Resource
 
     protected static bool $isScopedToTenant = true;
 
+    public static function getModelLabel(): string
+    {
+        return __('KPI');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('KPIs');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return KpiForm::configure($schema);

@@ -33,9 +33,15 @@ final class SearchConsoleGeneralStats extends Page
 
     protected static ?int $navigationSort = -10;
 
-    protected static ?string $navigationLabel = 'General Search Console';
+    public static function getNavigationLabel(): string
+    {
+        return __('General Search Console');
+    }
 
-    protected static ?string $title = 'General Search Console Dashboard';
+    public function getTitle(): string
+    {
+        return __('General Search Console Dashboard');
+    }
 
     public function mount(): void
     {

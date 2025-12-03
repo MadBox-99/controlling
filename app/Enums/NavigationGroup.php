@@ -20,12 +20,12 @@ enum NavigationGroup implements HasIcon, HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::Analytics => 'Analytics',
-            self::SearchConsole => 'Search Console',
-            self::Kpis => 'KPIs',
-            self::Reports => 'Reports',
-            self::Configuration => 'Configuration',
-            self::Settings => 'Settings',
+            self::Analytics => __('Analytics'),
+            self::SearchConsole => __('Search Console'),
+            self::Kpis => __('KPIs'),
+            self::Reports => __('Reports'),
+            self::Configuration => __('Configuration'),
+            self::Settings => __('Settings'),
         };
     }
 

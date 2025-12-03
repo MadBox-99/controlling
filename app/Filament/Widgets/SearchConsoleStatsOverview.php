@@ -38,7 +38,7 @@ final class SearchConsoleStatsOverview extends StatsOverviewWidget
                 ->color('success'),
 
             Stat::make('Átlagos CTR', number_format((float) $stats['avg_ctr'], 2) . '%')
-                ->description('Click-through rate')
+                ->description(__('Click-through rate'))
                 ->color('warning'),
 
             Stat::make('Átlagos pozíció', number_format((float) $stats['avg_position'], 1))

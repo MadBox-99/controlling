@@ -22,6 +22,16 @@ final class SearchQueryResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = NavigationGroup::SearchConsole;
 
+    public static function getModelLabel(): string
+    {
+        return __('Search Query');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Search Queries');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return SearchQueryForm::configure($schema);

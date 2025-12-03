@@ -16,7 +16,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
-use UnitEnum;
 
 final class UserResource extends Resource
 {
@@ -24,12 +23,15 @@ final class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Administration';
-
     protected static ?int $navigationSort = 1;
 
     // Disable tenant scoping - Super-Admin should see all users
     protected static bool $isScopedToTenant = false;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Administration');
+    }
 
     public static function canAccess(): bool
     {
@@ -37,6 +39,16 @@ final class UserResource extends Resource
         $user = Auth::user();
 
         return $user?->isSuperAdmin() ?? false;
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('User');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Users');
     }
 
     public static function form(Schema $schema): Schema

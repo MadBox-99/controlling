@@ -17,9 +17,15 @@ final class AnalyticsGeneralStats extends Page
 
     protected static ?int $navigationSort = -5;
 
-    protected static ?string $navigationLabel = 'General Analytics';
+    public static function getNavigationLabel(): string
+    {
+        return __('General Analytics');
+    }
 
-    protected static ?string $title = 'General Analytics Dashboard';
+    public function getTitle(): string
+    {
+        return __('General Analytics Dashboard');
+    }
 
     protected function getHeaderWidgets(): array
     {

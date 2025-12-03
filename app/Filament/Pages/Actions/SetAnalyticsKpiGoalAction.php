@@ -21,7 +21,7 @@ final class SetAnalyticsKpiGoalAction
     public static function make(Closure $getTopPages): Action
     {
         return Action::make('setKpiGoal')
-            ->label('Set KPI Goal')
+            ->label(__('Set KPI Goal'))
             ->slideOver()
             ->stickyModalFooter()
             ->schema(function () use ($getTopPages): array {

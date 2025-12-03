@@ -21,7 +21,7 @@ final class SetSearchConsoleKpiGoalAction
     public static function make(Closure $getTopPages, Closure $getTopQueries): Action
     {
         return Action::make('setKpiGoal')
-            ->label('Set KPI Goal')
+            ->label(__('Set KPI Goal'))
             ->slideOver()
             ->stickyModalFooter()
             ->schema(function () use ($getTopPages, $getTopQueries): array {

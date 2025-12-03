@@ -24,6 +24,16 @@ final class RoleResource extends Resource
 
     protected static bool $isScopedToTenant = false;
 
+    public static function getModelLabel(): string
+    {
+        return __('Role');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Roles');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return RoleForm::configure($schema);

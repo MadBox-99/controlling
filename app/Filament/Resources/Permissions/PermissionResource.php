@@ -24,6 +24,16 @@ final class PermissionResource extends Resource
 
     protected static bool $isScopedToTenant = false;
 
+    public static function getModelLabel(): string
+    {
+        return __('Permission');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Permissions');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return PermissionForm::configure($schema);

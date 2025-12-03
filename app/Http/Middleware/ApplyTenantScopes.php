@@ -11,6 +11,7 @@ use App\Models\AnalyticsSession;
 use App\Models\Kpi;
 use App\Models\SearchPage;
 use App\Models\SearchQuery;
+use App\Models\Settings;
 use Closure;
 use Filament\Facades\Filament;
 use Illuminate\Http\Request;
@@ -34,6 +35,7 @@ final class ApplyTenantScopes
                 AnalyticsSession::class,
                 AnalyticsEvent::class,
                 AnalyticsConversion::class,
+                Settings::class,
             ];
 
             foreach ($models as $model) {

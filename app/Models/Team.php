@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 final class Team extends Model
 {
@@ -61,5 +62,13 @@ final class Team extends Model
     public function analyticsConversions(): HasMany
     {
         return $this->hasMany(AnalyticsConversion::class);
+    }
+
+    /**
+     * @return HasOne<Settings, $this>
+     */
+    public function settings(): HasOne
+    {
+        return $this->hasOne(Settings::class);
     }
 }

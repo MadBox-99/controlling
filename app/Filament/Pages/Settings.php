@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Enums\NavigationGroup;
+use App\Models\GlobalSetting;
 use App\Models\Settings as SettingsModel;
+use App\Models\Team;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -36,7 +39,10 @@ final class Settings extends Page
 
     public function mount(): void
     {
-        $this->form->fill($this->getRecord()?->attributesToArray());
+        $this->form->fill([
+            ...$this->getRecord()?->attributesToArray() ?? [],
+            'google_service_account' => $this->getGlobalSettings()->google_service_account,
+        ]);
     }
 
     public function form(Schema $schema): Schema
@@ -45,7 +51,7 @@ final class Settings extends Page
             ->components([
                 Form::make([
                     Section::make('Google Analytics Configuration')
-                        ->description('Configure Google Analytics 4 property settings')
+                        ->description('Configure Google Analytics 4 property settings for this team')
                         ->schema([
                             TextInput::make('property_id')
                                 ->label('GA4 Property ID')
@@ -61,7 +67,7 @@ final class Settings extends Page
                         ->columns(2),
 
                     Section::make('Google Search Console Configuration')
-                        ->description('Configure Search Console property settings')
+                        ->description('Configure Search Console property settings for this team')
                         ->schema([
                             TextInput::make('site_url')
                                 ->label('Site URL')
@@ -72,7 +78,7 @@ final class Settings extends Page
                         ]),
 
                     Section::make('Google Service Account')
-                        ->description('Upload the Google Service Account JSON key file for API authentication')
+                        ->description('Upload the Google Service Account JSON key file for API authentication (shared across all teams)')
                         ->schema([
                             FileUpload::make('google_service_account')
                                 ->label('Service Account JSON Key')
@@ -99,10 +105,21 @@ final class Settings extends Page
     {
         $data = $this->form->getState();
 
+        // Handle global settings (service account)
+        $globalSettings = $this->getGlobalSettings();
+        if (isset($data['google_service_account'])) {
+            $globalSettings->google_service_account = $data['google_service_account'];
+            $globalSettings->save();
+        }
+        unset($data['google_service_account']);
+
+        // Handle team-specific settings
         $record = $this->getRecord();
+        $tenant = $this->getTenant();
 
         if (! $record instanceof SettingsModel) {
             $record = new SettingsModel();
+            $record->team_id = $tenant?->id;
         }
 
         $record->fill($data);
@@ -120,6 +137,24 @@ final class Settings extends Page
 
     public function getRecord(): ?SettingsModel
     {
-        return SettingsModel::query()->first();
+        $tenant = $this->getTenant();
+
+        if (! $tenant) {
+            return null;
+        }
+
+        return SettingsModel::query()
+            ->where('team_id', $tenant->id)
+            ->first();
+    }
+
+    public function getGlobalSettings(): GlobalSetting
+    {
+        return GlobalSetting::instance();
+    }
+
+    private function getTenant(): ?Team
+    {
+        return Filament::getTenant();
     }
 }
