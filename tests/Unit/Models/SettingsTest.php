@@ -3,9 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Settings;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
+use App\Models\Team;
 
 it('can be created using factory', function (): void {
     $settings = Settings::factory()->create();
@@ -18,20 +16,12 @@ it('has correct fillable attributes', function (): void {
     $settings = new Settings();
 
     expect($settings->getFillable())->toBe([
-        'google_service_account',
+        'team_id',
         'property_id',
         'google_tag_id',
         'site_url',
         'last_sync_at',
     ]);
-});
-
-it('casts google_service_account to array', function (): void {
-    $serviceAccount = ['type' => 'service_account', 'project_id' => 'test'];
-    $settings = Settings::factory()->create(['google_service_account' => $serviceAccount]);
-
-    expect($settings->google_service_account)->toBeArray()
-        ->and($settings->google_service_account)->toBe($serviceAccount);
 });
 
 it('casts last_sync_at to datetime', function (): void {
@@ -40,18 +30,18 @@ it('casts last_sync_at to datetime', function (): void {
     expect($settings->last_sync_at)->toBeInstanceOf(DateTimeInterface::class);
 });
 
-it('can get service account', function (): void {
-    $serviceAccount = ['type' => 'service_account', 'project_id' => 'test'];
-    $settings = Settings::factory()->create(['google_service_account' => $serviceAccount]);
+it('belongs to a team', function (): void {
+    $team = Team::factory()->create();
+    $settings = Settings::factory()->create(['team_id' => $team->id]);
 
-    expect($settings->getServiceAccount())->toBe($serviceAccount);
+    expect($settings->team)->toBeInstanceOf(Team::class)
+        ->and($settings->team->id)->toBe($team->id);
 });
 
-it('can set service account', function (): void {
-    $settings = Settings::factory()->create();
-    $newServiceAccount = ['type' => 'service_account', 'project_id' => 'new-test'];
+it('can access settings through team relationship', function (): void {
+    $team = Team::factory()->create();
+    $settings = Settings::factory()->create(['team_id' => $team->id]);
 
-    $settings->setServiceAccount($newServiceAccount);
-
-    expect($settings->fresh()->google_service_account)->toBe($newServiceAccount);
+    expect($team->settings)->toBeInstanceOf(Settings::class)
+        ->and($team->settings->id)->toBe($settings->id);
 });

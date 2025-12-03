@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Settings;
+use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +21,7 @@ final class SettingsFactory extends Factory
     public function definition(): array
     {
         return [
-            'google_service_account' => ['type' => 'service_account', 'project_id' => fake()->word()],
+            'team_id' => Team::factory(),
             'property_id' => (string) fake()->randomNumber(9),
             'google_tag_id' => 'G-' . mb_strtoupper(fake()->bothify('########')),
             'site_url' => fake()->url(),

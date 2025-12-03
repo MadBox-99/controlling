@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Models\GlobalSetting;
 use App\Models\Settings;
+use App\Services\GoogleClientFactory;
 use Exception;
-use Google\Client;
 use Google\Service\AnalyticsData;
 use Google\Service\AnalyticsData\DateRange;
 use Google\Service\AnalyticsData\Dimension;
 use Google\Service\AnalyticsData\Metric;
 use Google\Service\AnalyticsData\RunReportRequest;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 use Sushi\Sushi;
 
 /**
@@ -36,17 +36,23 @@ final class SourcePageModel extends Model
     public function getRows(): array
     {
         try {
-            $settings = Settings::query()->first();
+            $globalSettings = GlobalSetting::instance();
+            $serviceAccount = $globalSettings->getServiceAccount();
 
-            if (! $settings || ! $settings->google_service_account || ! $settings->property_id) {
+            if (! $serviceAccount) {
                 return [];
             }
 
-            $client = new Client();
-            $client->useApplicationDefaultCredentials();
-            $client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);
-            $client->setAuthConfig(Storage::json($settings->google_service_account));
+            $settings = Settings::query()->first();
 
+            if (! $settings || ! $settings->property_id) {
+                return [];
+            }
+
+            $client = GoogleClientFactory::make(
+                'https://www.googleapis.com/auth/analytics.readonly',
+                $globalSettings->google_service_account,
+            );
             $service = new AnalyticsData($client);
 
             $dateRange = new DateRange();

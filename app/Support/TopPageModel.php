@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Models\GlobalSetting;
 use App\Models\Settings;
 use App\Services\GoogleClientFactory;
 use Exception;
@@ -34,15 +35,22 @@ final class TopPageModel extends Model
     public function getRows(): array
     {
         try {
+            $globalSettings = GlobalSetting::instance();
+            $serviceAccount = $globalSettings->getServiceAccount();
+
+            if (! $serviceAccount) {
+                return [];
+            }
+
             $settings = Settings::query()->first();
 
-            if (! $settings || ! $settings->google_service_account || ! $settings->property_id) {
+            if (! $settings || ! $settings->property_id) {
                 return [];
             }
 
             $client = GoogleClientFactory::make(
                 'https://www.googleapis.com/auth/analytics.readonly',
-                $settings->google_service_account,
+                $globalSettings->google_service_account,
             );
             $service = new AnalyticsData($client);
 

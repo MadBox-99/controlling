@@ -29,10 +29,6 @@ pest()->extend(TestCase::class)
         $this->freezeTime();
     })
     ->in('Feature', 'Unit');
-uses(
-    TestCase::class,
-    // Illuminate\Foundation\Testing\RefreshDatabase::class,
-)->in('Feature', 'Unit');
 /*
 |--------------------------------------------------------------------------
 | Expectations

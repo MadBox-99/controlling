@@ -8,6 +8,7 @@ use App\Enums\NavigationGroup;
 use App\Filament\Pages\Actions\SetAnalyticsKpiGoalAction;
 use App\Models\AnalyticsPageview;
 use App\Models\AnalyticsSession;
+use App\Models\GlobalSetting;
 use App\Models\Settings;
 use App\Services\GoogleClientFactory;
 use Exception;
@@ -131,15 +132,22 @@ final class AnalyticsStats extends Page
     private function runReport(array $dimensions, array $metrics, callable $extractRow, string $sortBy): array
     {
         try {
+            $globalSettings = GlobalSetting::instance();
+            $serviceAccount = $globalSettings->getServiceAccount();
+
+            if (! $serviceAccount) {
+                return [];
+            }
+
             $settings = Settings::query()->first();
 
-            if (! $settings || ! $settings->google_service_account || ! $settings->property_id) {
+            if (! $settings || ! $settings->property_id) {
                 return [];
             }
 
             $client = GoogleClientFactory::make(
                 'https://www.googleapis.com/auth/analytics.readonly',
-                $settings->google_service_account,
+                $globalSettings->google_service_account,
             );
             $service = new AnalyticsData($client);
 

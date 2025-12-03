@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Models\GlobalSetting;
 use App\Models\SearchPage;
 use App\Models\SearchQuery;
 use App\Models\Settings;
+use App\Models\Team;
 use App\Services\GoogleClientFactory;
 
 use function array_slice;
@@ -24,37 +26,42 @@ final class SearchConsoleImport implements ShouldQueue
     use Batchable;
     use Queueable;
 
+    public function __construct(
+        public readonly int $teamId,
+    ) {}
+
     public function handle(): void
     {
-        $settings = Settings::query()->first();
+        $team = Team::query()->find($this->teamId);
 
-        if (! $settings || ! $settings->google_service_account) {
-            Notification::make()
-                ->title('Google Service Account credentials not configured.')
-                ->body('Please configure the credentials in Settings first.')
-                ->danger()
-                ->send();
-
-            $this->fail('Google Service Account credentials not configured.');
+        if (! $team) {
+            $this->failWithNotification('Team not found.', 'The specified team does not exist.');
 
             return;
         }
 
-        if (! $settings->site_url) {
-            Notification::make()
-                ->title('Site URL not configured.')
-                ->body('Please configure the Site URL in Settings first.')
-                ->danger()
-                ->send();
+        $globalSettings = GlobalSetting::instance();
+        $serviceAccount = $globalSettings->getServiceAccount();
 
-            $this->fail('Site URL not configured.');
+        if (! $serviceAccount) {
+            $this->failWithNotification('Google Service Account credentials not configured.', 'Please configure the credentials in Settings first.');
+
+            return;
+        }
+
+        $settings = Settings::query()
+            ->where('team_id', $this->teamId)
+            ->first();
+
+        if (! $settings || ! $settings->site_url) {
+            $this->failWithNotification('Site URL not configured.', 'Please configure the Site URL in Settings first.');
 
             return;
         }
 
         $client = GoogleClientFactory::make(
             'https://www.googleapis.com/auth/webmasters.readonly',
-            $settings->google_service_account,
+            $globalSettings->google_service_account,
         );
         $service = new SearchConsole($client);
 
@@ -84,6 +91,7 @@ final class SearchConsoleImport implements ShouldQueue
                 $first = $rows->first();
 
                 $values = [
+                    'team_id' => $this->teamId,
                     'impressions' => $rows->sum(fn ($r): int => (int) $r->getImpressions()),
                     'clicks' => $rows->sum(fn ($r): int => (int) $r->getClicks()),
                     'ctr' => $rows->avg(fn ($r): int|float => $r->getCtr() * 100),
@@ -91,6 +99,8 @@ final class SearchConsoleImport implements ShouldQueue
                 ];
 
                 $record = SearchQuery::query()
+                    ->withoutGlobalScope('team')
+                    ->where('team_id', $this->teamId)
                     ->whereDate('date', $first->getKeys()[0])
                     ->where('query', $first->getKeys()[1])
                     ->where('country', $first->getKeys()[2])
@@ -126,6 +136,7 @@ final class SearchConsoleImport implements ShouldQueue
                 $first = $rows->first();
 
                 $values = [
+                    'team_id' => $this->teamId,
                     'impressions' => $rows->sum(fn ($r): int => (int) $r->getImpressions()),
                     'clicks' => $rows->sum(fn ($r): int => (int) $r->getClicks()),
                     'ctr' => $rows->avg(fn ($r): int|float => $r->getCtr() * 100),
@@ -133,6 +144,8 @@ final class SearchConsoleImport implements ShouldQueue
                 ];
 
                 $record = SearchPage::query()
+                    ->withoutGlobalScope('team')
+                    ->where('team_id', $this->teamId)
                     ->whereDate('date', $first->getKeys()[0])
                     ->where('page_url', $first->getKeys()[1])
                     ->where('country', $first->getKeys()[2])
@@ -165,5 +178,11 @@ final class SearchConsoleImport implements ShouldQueue
         $request->setRowLimit(25000);
 
         return $request;
+    }
+
+    private function failWithNotification(string $title, string $body): void
+    {
+        Notification::make()->title($title)->body($body)->danger()->send();
+        $this->fail($title);
     }
 }

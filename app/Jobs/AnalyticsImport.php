@@ -8,7 +8,9 @@ use App\Models\AnalyticsConversion;
 use App\Models\AnalyticsEvent;
 use App\Models\AnalyticsPageview;
 use App\Models\AnalyticsSession;
+use App\Models\GlobalSetting;
 use App\Models\Settings;
+use App\Models\Team;
 use App\Services\GoogleClientFactory;
 use Closure;
 use Filament\Notifications\Notification;
@@ -31,17 +33,34 @@ final class AnalyticsImport implements ShouldQueue
     use Batchable;
     use Queueable;
 
+    public function __construct(
+        public readonly int $teamId,
+    ) {}
+
     public function handle(): void
     {
-        $settings = Settings::query()->first();
+        $team = Team::query()->find($this->teamId);
 
-        if (! $settings || ! $settings->google_service_account) {
+        if (! $team) {
+            $this->failWithNotification('Team not found.', 'The specified team does not exist.');
+
+            return;
+        }
+
+        $globalSettings = GlobalSetting::instance();
+        $serviceAccount = $globalSettings->getServiceAccount();
+
+        if (! $serviceAccount) {
             $this->failWithNotification('Google Service Account credentials not configured.', 'Please configure the credentials in Settings first.');
 
             return;
         }
 
-        if (! $settings->property_id) {
+        $settings = Settings::query()
+            ->where('team_id', $this->teamId)
+            ->first();
+
+        if (! $settings || ! $settings->property_id) {
             $this->failWithNotification('GA4 Property ID not configured.', 'Please configure the Property ID in Settings first.');
 
             return;
@@ -49,7 +68,7 @@ final class AnalyticsImport implements ShouldQueue
 
         $client = GoogleClientFactory::make(
             'https://www.googleapis.com/auth/analytics.readonly',
-            $settings->google_service_account,
+            $globalSettings->google_service_account,
         );
         $service = new AnalyticsData($client);
 
@@ -73,6 +92,7 @@ final class AnalyticsImport implements ShouldQueue
             dimensions: ['date', 'sessionSource', 'sessionMedium', 'sessionCampaignName'],
             metrics: ['sessions', 'totalUsers', 'newUsers', 'bounceRate', 'averageSessionDuration'],
             extractRow: fn (Row $row): array => [
+                'team_id' => $this->teamId,
                 'date' => $this->parseDate($row->getDimensionValues()[0]->getValue()),
                 'source' => $row->getDimensionValues()[1]->getValue(),
                 'medium' => $row->getDimensionValues()[2]->getValue(),
@@ -87,6 +107,8 @@ final class AnalyticsImport implements ShouldQueue
             sumFields: ['sessions', 'users', 'new_users', 'bounce_rate', 'avg_session_duration'],
             avgFields: ['bounce_rate', 'avg_session_duration'],
             findRecord: fn (array $d): ?Model => AnalyticsSession::query()
+                ->withoutGlobalScope('team')
+                ->where('team_id', $this->teamId)
                 ->whereDate('date', $d['date'])
                 ->where('source', $d['source'])
                 ->where('medium', $d['medium'])
@@ -104,6 +126,7 @@ final class AnalyticsImport implements ShouldQueue
             dimensions: ['date', 'pagePath', 'pageTitle'],
             metrics: ['screenPageViews', 'sessions', 'averageSessionDuration', 'bounceRate'],
             extractRow: fn (Row $row): array => [
+                'team_id' => $this->teamId,
                 'date' => $this->parseDate($row->getDimensionValues()[0]->getValue()),
                 'page_path' => $row->getDimensionValues()[1]->getValue(),
                 'page_title' => $row->getDimensionValues()[2]->getValue(),
@@ -116,6 +139,8 @@ final class AnalyticsImport implements ShouldQueue
             sumFields: ['pageviews', 'unique_pageviews', 'avg_time_on_page', 'bounce_rate'],
             avgFields: ['avg_time_on_page', 'bounce_rate'],
             findRecord: fn (array $d): ?Model => AnalyticsPageview::query()
+                ->withoutGlobalScope('team')
+                ->where('team_id', $this->teamId)
                 ->whereDate('date', $d['date'])
                 ->where('page_path', $d['page_path'])
                 ->first(),
@@ -131,6 +156,7 @@ final class AnalyticsImport implements ShouldQueue
             dimensions: ['date', 'eventName'],
             metrics: ['eventCount', 'eventValue'],
             extractRow: fn (Row $row): array => [
+                'team_id' => $this->teamId,
                 'date' => $this->parseDate($row->getDimensionValues()[0]->getValue()),
                 'event_name' => $row->getDimensionValues()[1]->getValue(),
                 'event_category' => 'engagement',
@@ -142,6 +168,8 @@ final class AnalyticsImport implements ShouldQueue
             sumFields: ['event_count', 'event_value'],
             avgFields: [],
             findRecord: fn (array $d): ?Model => AnalyticsEvent::query()
+                ->withoutGlobalScope('team')
+                ->where('team_id', $this->teamId)
                 ->whereDate('date', $d['date'])
                 ->where('event_name', $d['event_name'])
                 ->where('event_category', 'engagement')
@@ -160,6 +188,7 @@ final class AnalyticsImport implements ShouldQueue
             dimensions: ['date'],
             metrics: ['conversions', 'totalRevenue', 'sessions'],
             extractRow: fn (Row $row): array => [
+                'team_id' => $this->teamId,
                 'date' => $this->parseDate($row->getDimensionValues()[0]->getValue()),
                 'goal_name' => 'All Conversions',
                 'goal_completions' => (int) $row->getMetricValues()[0]->getValue(),
@@ -170,6 +199,8 @@ final class AnalyticsImport implements ShouldQueue
             sumFields: ['goal_completions', 'goal_value', 'sessions'],
             avgFields: [],
             findRecord: fn (array $d): ?Model => AnalyticsConversion::query()
+                ->withoutGlobalScope('team')
+                ->where('team_id', $this->teamId)
                 ->whereDate('date', $d['date'])
                 ->where('goal_name', 'All Conversions')
                 ->first(),
