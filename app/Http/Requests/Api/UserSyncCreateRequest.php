@@ -10,20 +10,21 @@ final class UserSyncCreateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return true; // Handled by API key middleware
     }
 
     /**
-     * @return array<string, array<string>>
+     * @return array<string, array<int, string>>
      */
     public function rules(): array
     {
         return [
             'email' => ['required', 'email', 'unique:users,email'],
             'name' => ['required', 'string', 'max:255'],
-            'password_hash' => ['required', 'string'],
-            'role' => ['required', 'string', 'in:subscriber,manager'],
-            'team_ids' => [],
+            'password' => ['required', 'string'], // Raw password - will be hashed in controller
+            'role' => ['nullable', 'string'],
+            'team_ids' => ['nullable', 'array'],
+            'team_ids.*' => ['integer', 'exists:teams,id'],
         ];
     }
 }

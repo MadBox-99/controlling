@@ -9,6 +9,7 @@ use App\Http\Requests\Api\UserSyncCreateRequest;
 use App\Http\Requests\Api\UserSyncRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 final class UserSyncController extends Controller
@@ -17,28 +18,27 @@ final class UserSyncController extends Controller
     {
         $validated = $request->validated();
 
+        // Create user with raw password - we hash it here
         $user = User::query()->create([
             'email' => $validated['email'],
             'name' => $validated['name'],
-            'password' => 'temporary',
-        ]);
-
-        $teamIds = $validated['team_ids'] ?? [];
-        Log::info('Created user in secondary app', ['team_ids' => $teamIds]);
-
-        foreach ($teamIds as $teamId) {
-            Log::info('Assigning team to created user', ['email' => $user->email, 'team_id' => $teamId]);
-        }
-
-        $user->teams()->sync($teamIds);
-
-        // Bypass the hashed cast - password is already hashed
-        User::query()->where('id', $user->id)->update([
-            'password' => $validated['password_hash'],
+            'password' => Hash::make($validated['password']), // Raw password from main app
             'email_verified_at' => now(),
         ]);
 
-        $user->assignRole($validated['role']);
+        // Assign teams
+        $teamIds = $validated['team_ids'] ?? [];
+        if ($teamIds !== []) {
+            $user->teams()->sync($teamIds);
+            Log::info('Assigned teams to created user', ['email' => $user->email, 'team_ids' => $teamIds]);
+        }
+
+        // Assign role
+        if (isset($validated['role'])) {
+            $user->assignRole($validated['role']);
+        }
+
+        Log::info('User created successfully via sync', ['email' => $user->email]);
 
         return response()->json([
             'message' => 'User created successfully',
@@ -57,13 +57,17 @@ final class UserSyncController extends Controller
         if (isset($validated['new_email'])) {
             $updateData['email'] = $validated['new_email'];
         }
-        if (isset($validated['password_hash'])) {
-            $updateData['password'] = $validated['password_hash'];
+
+        // Raw password from main app - hash it here
+        if (isset($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
         }
 
         if ($updateData !== []) {
-            // Bypass the hashed cast - password is already hashed
-            User::query()->where('id', $user->id)->update($updateData);
+            // Use saveQuietly to avoid triggering observers (prevents sync loops)
+            $user->fill($updateData);
+            $user->saveQuietly();
+            Log::info('User synced successfully', ['email' => $validated['email'], 'fields' => array_keys($updateData)]);
         }
 
         if (isset($validated['role'])) {

@@ -10,7 +10,6 @@ use App\Models\Settings;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 final class DatabaseSeeder extends Seeder
 {
@@ -29,7 +28,7 @@ final class DatabaseSeeder extends Seeder
         $admin = User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@admin.com',
-            'password' => Hash::make('password'),
+            'password' => 'password',
             'is_active' => true,
         ]);
 
@@ -40,7 +39,7 @@ final class DatabaseSeeder extends Seeder
         $user = User::factory()->create([
             'name' => 'Regular User',
             'email' => 'user@user.com',
-            'password' => Hash::make('password'),
+            'password' => 'password',
             'is_active' => true,
         ]);
 
@@ -51,7 +50,7 @@ final class DatabaseSeeder extends Seeder
         $multiTeamUser = User::factory()->create([
             'name' => 'Multi Team User',
             'email' => 'team@team.com',
-            'password' => Hash::make('password'),
+            'password' => 'password',
             'is_active' => true,
         ]);
 
