@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Models\GlobalSetting;
-use App\Models\Settings;
 use App\Services\GoogleClientFactory;
 use Exception;
+use Filament\Facades\Filament;
 use Google\Service\AnalyticsData;
 use Google\Service\AnalyticsData\DateRange;
 use Google\Service\AnalyticsData\Dimension;
@@ -39,7 +39,7 @@ final class SessionSourceModel extends Model
                 return [];
             }
 
-            $settings = Settings::query()->first();
+            $settings = Filament::getTenant()?->settings;
 
             if (! $settings || ! $settings->property_id) {
                 return [];

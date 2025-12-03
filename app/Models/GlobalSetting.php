@@ -7,6 +7,7 @@ namespace App\Models;
 use Database\Factories\GlobalSettingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 final class GlobalSetting extends Model
 {
@@ -39,21 +40,7 @@ final class GlobalSetting extends Model
             return null;
         }
 
-        $path = storage_path('app/' . $this->google_service_account);
-
-        if (! file_exists($path)) {
-            return null;
-        }
-
-        $contents = file_get_contents($path);
-
-        if ($contents === false) {
-            return null;
-        }
-
-        /** @var array<string, mixed>|null $decoded */
-        $decoded = json_decode($contents, true);
-
-        return $decoded;
+        /** @var array<string, mixed>|null */
+        return Storage::json($this->google_service_account);
     }
 }

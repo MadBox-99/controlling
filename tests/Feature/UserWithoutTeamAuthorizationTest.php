@@ -16,12 +16,12 @@ beforeEach(function (): void {
     $this->seed(PermissionSeeder::class);
 });
 
-it('user without team cannot create new team', function (): void {
+it('subscriber without team cannot create new team', function (): void {
     // Create a regular user without team
     $user = User::factory()->create([
         'is_active' => true,
     ]);
-    $user->assignRole('user');
+    $user->assignRole('subscriber');
 
     // User has no teams
     expect($user->teams)->toHaveCount(0);
@@ -34,11 +34,11 @@ it('user without team cannot create new team', function (): void {
         ->assertStatus(404); // Should be forbidden/not found because user is not admin
 });
 
-it('user without team cannot create team via gate', function (): void {
+it('subscriber without team cannot create team via gate', function (): void {
     $user = User::factory()->create([
         'is_active' => true,
     ]);
-    $user->assignRole('user');
+    $user->assignRole('subscriber');
 
     actingAs($user);
 
@@ -60,11 +60,11 @@ it('user without team but is admin can create team', function (): void {
     expect($user->can('create', Team::class))->toBeTrue();
 });
 
-it('user without team cannot access filament admin panel', function (): void {
+it('subscriber without team cannot access filament admin panel', function (): void {
     $user = User::factory()->create([
         'is_active' => true,
     ]);
-    $user->assignRole('user');
+    $user->assignRole('subscriber');
 
     actingAs($user);
 

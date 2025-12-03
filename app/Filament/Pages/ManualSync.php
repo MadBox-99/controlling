@@ -8,8 +8,10 @@ use App\Enums\NavigationGroup;
 use App\Jobs\AnalyticsImport;
 use App\Jobs\SearchConsoleImport;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 final class ManualSync extends Page
@@ -24,7 +26,18 @@ final class ManualSync extends Page
 
     public function performAnalyticsSync(): void
     {
-        dispatch(new AnalyticsImport());
+        $teamId = Filament::getTenant()?->id;
+
+        if (! $teamId) {
+            Notification::make()
+                ->title('No team selected.')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        dispatch(new AnalyticsImport($teamId));
 
         Notification::make()
             ->title('Analytics sync started successfully.')
@@ -35,7 +48,18 @@ final class ManualSync extends Page
 
     public function performSearchConsoleSync(): void
     {
-        dispatch(new SearchConsoleImport());
+        $teamId = Filament::getTenant()?->id;
+
+        if (! $teamId) {
+            Notification::make()
+                ->title('No team selected.')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        dispatch(new SearchConsoleImport($teamId));
 
         Notification::make()
             ->title('Search Console sync started successfully.')
@@ -46,17 +70,21 @@ final class ManualSync extends Page
 
     protected function getHeaderActions(): array
     {
+        $isAdmin = Auth::user()?->isAdmin() ?? false;
+
         return [
             Action::make('syncAnalytics')
                 ->label('Sync Analytics')
                 ->icon('heroicon-o-chart-bar')
                 ->color('primary')
-                ->action('performAnalyticsSync'),
+                ->action('performAnalyticsSync')
+                ->disabled(! $isAdmin),
             Action::make('syncSearchConsole')
                 ->label('Sync Search Console')
                 ->icon('heroicon-o-magnifying-glass')
                 ->color('success')
-                ->action('performSearchConsoleSync'),
+                ->action('performSearchConsoleSync')
+                ->disabled(! $isAdmin),
         ];
     }
 }

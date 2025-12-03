@@ -24,7 +24,7 @@ beforeEach(function (): void {
 
     $this->user = User::factory()->create();
     $this->user->teams()->attach($this->team);
-    $this->user->assignRole('user');
+    $this->user->assignRole('subscriber');
 
     actingAs($this->admin);
     Filament::setTenant($this->team);

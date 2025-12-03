@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\SyncPasswordController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\UserSyncController;
 use Illuminate\Support\Facades\Route;
@@ -11,4 +12,5 @@ Route::middleware('api.key')->group(function (): void {
     Route::post('/sync-user', [UserSyncController::class, 'sync']);
     Route::post('/create-team', [TeamController::class, 'create']);
     Route::get('/user-teams', [TeamController::class, 'getUserTeams']);
+    Route::post('/sync-password', SyncPasswordController::class);
 });

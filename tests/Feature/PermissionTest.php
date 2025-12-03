@@ -52,13 +52,13 @@ it('assigns all permissions to admin role', function (): void {
     expect($adminRole->hasPermissionTo('manage team users'))->toBeTrue();
 });
 
-it('assigns limited permissions to user role', function (): void {
-    $userRole = Role::findByName('user', 'web');
+it('assigns limited permissions to subscriber role', function (): void {
+    $subscriberRole = Role::findByName('subscriber', 'web');
 
-    expect($userRole->hasPermissionTo('view teams'))->toBeTrue();
-    expect($userRole->hasPermissionTo('view kpis'))->toBeTrue();
-    expect($userRole->hasPermissionTo('create teams'))->toBeFalse();
-    expect($userRole->hasPermissionTo('delete teams'))->toBeFalse();
+    expect($subscriberRole->hasPermissionTo('view teams'))->toBeTrue();
+    expect($subscriberRole->hasPermissionTo('view kpis'))->toBeTrue();
+    expect($subscriberRole->hasPermissionTo('create teams'))->toBeFalse();
+    expect($subscriberRole->hasPermissionTo('delete teams'))->toBeFalse();
 });
 
 it('allows admin users to have all permissions', function (): void {
@@ -74,9 +74,9 @@ it('allows admin users to have all permissions', function (): void {
     expect($admin->can('delete users'))->toBeTrue();
 });
 
-it('allows user role to have limited permissions', function (): void {
+it('allows subscriber role to have limited permissions', function (): void {
     $user = User::factory()->create();
-    $user->assignRole('user');
+    $user->assignRole('subscriber');
 
     actingAs($user);
 

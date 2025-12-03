@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\UserRole;
+use App\Models\GlobalSetting;
 use App\Models\Settings;
 use App\Models\Team;
 use App\Models\User;
@@ -74,9 +75,14 @@ final class DatabaseSeeder extends Seeder
         $user->teams()->attach($team);
         $multiTeamUser->teams()->attach([$team->id, $team2->id]);
 
-        // Create analytics settings
-        Settings::query()->create([
+        // Create global settings with service account
+        GlobalSetting::query()->create([
             'google_service_account' => 'google-service-account.json',
+        ]);
+
+        // Create analytics settings for default team
+        Settings::query()->create([
+            'team_id' => $team->id,
             'property_id' => '442849954',
             'google_tag_id' => 'G-12345678',
             'site_url' => 'https://cegem360.eu',

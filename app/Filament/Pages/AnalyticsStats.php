@@ -9,9 +9,9 @@ use App\Filament\Pages\Actions\SetAnalyticsKpiGoalAction;
 use App\Models\AnalyticsPageview;
 use App\Models\AnalyticsSession;
 use App\Models\GlobalSetting;
-use App\Models\Settings;
 use App\Services\GoogleClientFactory;
 use Exception;
+use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Google\Service\AnalyticsData;
 use Google\Service\AnalyticsData\DateRange;
@@ -139,7 +139,7 @@ final class AnalyticsStats extends Page
                 return [];
             }
 
-            $settings = Settings::query()->first();
+            $settings = Filament::getTenant()?->settings;
 
             if (! $settings || ! $settings->property_id) {
                 return [];

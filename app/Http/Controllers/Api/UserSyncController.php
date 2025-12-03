@@ -22,12 +22,15 @@ final class UserSyncController extends Controller
             'name' => $validated['name'],
             'password' => 'temporary',
         ]);
-        Log::info('Created user in secondary app', $validated['team_ids']);
-        foreach ($validated['team_ids'] ?? [] as $teamId) {
+
+        $teamIds = $validated['team_ids'] ?? [];
+        Log::info('Created user in secondary app', ['team_ids' => $teamIds]);
+
+        foreach ($teamIds as $teamId) {
             Log::info('Assigning team to created user', ['email' => $user->email, 'team_id' => $teamId]);
         }
 
-        $user->teams()->sync($validated['team_ids']);
+        $user->teams()->sync($teamIds);
 
         // Bypass the hashed cast - password is already hashed
         User::query()->where('id', $user->id)->update([

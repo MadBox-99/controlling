@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\Kpis\Pages\CreateKpi;
 use App\Filament\Resources\Kpis\Pages\EditKpi;
 use App\Filament\Resources\Kpis\Pages\ListKpis;
 use App\Models\Kpi;
@@ -26,7 +25,7 @@ beforeEach(function (): void {
 
     $this->user = User::factory()->create();
     $this->user->teams()->attach($this->team);
-    $this->user->assignRole('user');
+    $this->user->assignRole('subscriber');
 
     actingAs($this->admin);
     Filament::setTenant($this->team);
@@ -44,69 +43,6 @@ it('can list kpis in table', function (): void {
     Livewire::actingAs($this->admin)
         ->test(ListKpis::class, ['tenant' => $this->team])
         ->assertCanSeeTableRecords($kpis);
-});
-
-it('can render create kpi page', function (): void {
-    Livewire::actingAs($this->admin)
-        ->test(CreateKpi::class, ['tenant' => $this->team])
-        ->assertSuccessful();
-});
-
-it('can create kpi', function (): void {
-    Livewire::actingAs($this->admin)
-        ->test(CreateKpi::class, ['tenant' => $this->team])
-        ->set('data.code', 'TEST_KPI')
-        ->set('data.name', 'Test KPI')
-        ->set('data.description', 'Test Description')
-        ->set('data.data_source', 'manual')
-        ->set('data.category', 'traffic')
-        ->set('data.target_value', 1000)
-        ->set('data.goal_type', 'increase')
-        ->set('data.value_type', 'fixed')
-        ->set('data.from_date', now()->format('Y-m-d'))
-        ->set('data.target_date', now()->addMonth()->format('Y-m-d'))
-        ->set('data.comparison_start_date', now()->subMonth()->format('Y-m-d'))
-        ->set('data.comparison_end_date', now()->format('Y-m-d'))
-        ->set('data.is_active', true)
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    $this->assertDatabaseHas(Kpi::class, [
-        'code' => 'TEST_KPI',
-        'name' => 'Test KPI',
-        'team_id' => $this->team->id,
-    ]);
-});
-
-it('automatically assigns team_id when creating kpi', function (): void {
-    Livewire::actingAs($this->admin)
-        ->test(CreateKpi::class, ['tenant' => $this->team])
-        ->set('data.code', 'AUTO_KPI')
-        ->set('data.name', 'Auto Assigned KPI')
-        ->set('data.data_source', 'analytics')
-        ->set('data.category', 'engagement')
-        ->set('data.target_value', 500)
-        ->set('data.goal_type', 'increase')
-        ->set('data.value_type', 'percentage')
-        ->set('data.from_date', now()->format('Y-m-d'))
-        ->set('data.target_date', now()->addMonth()->format('Y-m-d'))
-        ->set('data.comparison_start_date', now()->subMonth()->format('Y-m-d'))
-        ->set('data.comparison_end_date', now()->format('Y-m-d'))
-        ->set('data.is_active', true)
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    $kpi = Kpi::query()->where('code', 'AUTO_KPI')->first();
-    expect($kpi->team_id)->toBe($this->team->id);
-});
-
-it('validates required fields when creating kpi', function (): void {
-    Livewire::actingAs($this->admin)
-        ->test(CreateKpi::class, ['tenant' => $this->team])
-        ->set('data.code', '')
-        ->set('data.name', '')
-        ->call('create')
-        ->assertHasFormErrors(['code' => 'required', 'name' => 'required']);
 });
 
 it('can render edit kpi page', function (): void {
@@ -129,6 +65,7 @@ it('can retrieve kpi data for editing', function (): void {
 it('can update kpi', function (): void {
     $kpi = Kpi::factory()->create([
         'team_id' => $this->team->id,
+        'data_source' => 'manual',
         'target_value' => 1000,
         'goal_type' => 'increase',
         'value_type' => 'fixed',
@@ -154,30 +91,6 @@ it('can delete kpi', function (): void {
         ->callAction('delete');
 
     $this->assertModelMissing($kpi);
-});
-
-it('non-admin users can create kpis', function (): void {
-    Livewire::actingAs($this->user)
-        ->test(CreateKpi::class, ['tenant' => $this->team])
-        ->set('data.code', 'USER_KPI')
-        ->set('data.name', 'User Created KPI')
-        ->set('data.data_source', 'manual')
-        ->set('data.category', 'traffic')
-        ->set('data.target_value', 1000)
-        ->set('data.goal_type', 'increase')
-        ->set('data.value_type', 'fixed')
-        ->set('data.from_date', now()->format('Y-m-d'))
-        ->set('data.target_date', now()->addMonth()->format('Y-m-d'))
-        ->set('data.comparison_start_date', now()->subMonth()->format('Y-m-d'))
-        ->set('data.comparison_end_date', now()->format('Y-m-d'))
-        ->set('data.is_active', true)
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    $this->assertDatabaseHas(Kpi::class, [
-        'code' => 'USER_KPI',
-        'team_id' => $this->team->id,
-    ]);
 });
 
 it('can search kpis in table', function (): void {

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\GlobalSetting;
-use App\Models\Settings;
 use App\Services\GoogleClientFactory;
 use Exception;
+use Filament\Facades\Filament;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Google\Service\AnalyticsData;
@@ -60,7 +60,7 @@ final class GeneralStatsOverview extends StatsOverviewWidget
                 return $emptyStats;
             }
 
-            $settings = Settings::query()->first();
+            $settings = Filament::getTenant()?->settings;
 
             if (! $settings || ! $settings->property_id) {
                 return $emptyStats;

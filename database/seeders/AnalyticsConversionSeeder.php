@@ -16,11 +16,22 @@ final class AnalyticsConversionSeeder extends Seeder
     public function run(): void
     {
         $teams = Team::all();
+        $goalNames = ['Contact Form', 'Newsletter Signup', 'Purchase', 'Download', 'Registration'];
 
         foreach ($teams as $team) {
-            AnalyticsConversion::factory()->count(5)->create([
-                'team_id' => $team->id,
-            ]);
+            foreach ($goalNames as $index => $goalName) {
+                $date = now()->subMonths($team->id)->subDays($index)->format('Y-m-d');
+
+                AnalyticsConversion::query()->firstOrCreate(
+                    ['date' => $date, 'goal_name' => $goalName],
+                    [
+                        'team_id' => $team->id,
+                        'goal_completions' => fake()->numberBetween(1, 100),
+                        'goal_value' => fake()->randomFloat(2, 10, 5000),
+                        'conversion_rate' => fake()->randomFloat(2, 0.5, 25),
+                    ],
+                );
+            }
         }
     }
 }

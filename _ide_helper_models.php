@@ -178,6 +178,24 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
+ * @property string|null $google_service_account
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @method static \Database\Factories\GlobalSettingFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GlobalSetting newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GlobalSetting newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GlobalSetting query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GlobalSetting whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GlobalSetting whereGoogleServiceAccount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GlobalSetting whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GlobalSetting whereUpdatedAt($value)
+ */
+	final class GlobalSetting extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
  * @property string $code
  * @property string $name
  * @property string|null $description
@@ -313,24 +331,25 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property string|null $google_service_account
  * @property string $property_id
  * @property string $google_tag_id
  * @property string $site_url
  * @property \Carbon\CarbonImmutable|null $last_sync_at
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property int|null $team_id
+ * @property-read \App\Models\Team|null $team
  * @method static \Database\Factories\SettingsFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereGoogleServiceAccount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereGoogleTagId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereLastSyncAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings wherePropertyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereSiteUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereTeamId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereUpdatedAt($value)
  */
 	final class Settings extends \Eloquent {}
@@ -364,6 +383,7 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SearchQuery> $searchQueries
  * @property-read int|null $search_queries_count
  * @property-read bool|null $search_queries_exists
+ * @property-read \App\Models\Settings|null $settings
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
  * @property-read bool|null $users_exists
