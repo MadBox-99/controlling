@@ -12,8 +12,8 @@ use Spatie\Permission\Models\Role;
 beforeEach(function (): void {
     // Create roles for testing
     Role::findOrCreate('Super-Admin', 'web');
-    Role::findOrCreate('admin', 'web');
-    Role::findOrCreate('user', 'web');
+    Role::findOrCreate('Admin', 'web');
+    Role::findOrCreate('subscriber', 'web');
 });
 
 it('allows admins to create teams', function (): void {
@@ -119,7 +119,7 @@ it('allows all authenticated users to view any teams', function (): void {
 
 it('allows users with admin role to create teams', function (): void {
     $admin = User::factory()->create();
-    $admin->assignRole('admin');
+    $admin->assignRole('Admin');
 
     actingAs($admin);
 
@@ -128,7 +128,7 @@ it('allows users with admin role to create teams', function (): void {
 
 it('allows users with admin role to update teams', function (): void {
     $admin = User::factory()->create();
-    $admin->assignRole('admin');
+    $admin->assignRole('Admin');
     $team = Team::factory()->create();
 
     actingAs($admin);
@@ -138,7 +138,7 @@ it('allows users with admin role to update teams', function (): void {
 
 it('allows users with admin role to delete teams', function (): void {
     $admin = User::factory()->create();
-    $admin->assignRole('admin');
+    $admin->assignRole('Admin');
     $team = Team::factory()->create();
 
     actingAs($admin);
@@ -148,7 +148,7 @@ it('allows users with admin role to delete teams', function (): void {
 
 it('allows users with admin role to manage team users', function (): void {
     $admin = User::factory()->create();
-    $admin->assignRole('admin');
+    $admin->assignRole('Admin');
     $team = Team::factory()->create();
 
     actingAs($admin);

@@ -29,6 +29,7 @@ it('has correct fillable attributes', function (): void {
         'email',
         'password',
         'is_active',
+        'email_verified_at',
     ]);
 });
 

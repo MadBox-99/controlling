@@ -11,7 +11,7 @@ use Illuminate\Contracts\Support\Htmlable;
 enum UserRole: string implements HasColor, HasLabel
 {
     case SuperAdmin = 'Super-Admin';
-    case Admin = 'admin';
+    case Admin = 'Admin';
     case Manager = 'manager';
     case Subscriber = 'subscriber';
 

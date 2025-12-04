@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -21,7 +22,7 @@ describe('create', function (): void {
         $response = postJson('/api/create-user', [
             'email' => 'test@example.com',
             'name' => 'Test User',
-            'password_hash' => 'hashed_password',
+            'password' => 'secret123',
             'role' => 'subscriber',
         ], ['Authorization' => 'Bearer test-api-key']);
 
@@ -35,13 +36,14 @@ describe('create', function (): void {
 
         $user = User::query()->where('email', 'test@example.com')->first();
         expect($user->hasRole('subscriber'))->toBeTrue();
+        expect(Hash::check('secret123', $user->password))->toBeTrue();
     });
 
     it('returns unauthorized without api key', function (): void {
         $response = postJson('/api/create-user', [
             'email' => 'test@example.com',
             'name' => 'Test User',
-            'password_hash' => 'hashed_password',
+            'password' => 'secret123',
             'role' => 'subscriber',
         ]);
 
@@ -52,8 +54,7 @@ describe('create', function (): void {
         $data = [
             'email' => 'test@example.com',
             'name' => 'Test User',
-            'password_hash' => 'hashed_password',
-            'role' => 'subscriber',
+            'password' => 'secret123',
         ];
 
         unset($data[$field]);
@@ -64,7 +65,7 @@ describe('create', function (): void {
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors($field);
-    })->with(['email', 'name', 'password_hash', 'role']);
+    })->with(['email', 'name', 'password']);
 
     it('validates email uniqueness', function (): void {
         User::factory()->create(['email' => 'existing@example.com']);
@@ -72,24 +73,11 @@ describe('create', function (): void {
         $response = postJson('/api/create-user', [
             'email' => 'existing@example.com',
             'name' => 'Test User',
-            'password_hash' => 'hashed_password',
-            'role' => 'subscriber',
+            'password' => 'secret123',
         ], ['Authorization' => 'Bearer test-api-key']);
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors('email');
-    });
-
-    it('validates role values', function (): void {
-        $response = postJson('/api/create-user', [
-            'email' => 'test@example.com',
-            'name' => 'Test User',
-            'password_hash' => 'hashed_password',
-            'role' => 'invalid_role',
-        ], ['Authorization' => 'Bearer test-api-key']);
-
-        $response->assertUnprocessable()
-            ->assertJsonValidationErrors('role');
     });
 });
 
@@ -141,7 +129,7 @@ describe('sync', function (): void {
             ->assertJsonValidationErrors('new_email');
     });
 
-    it('updates password hash', function (): void {
+    it('updates password', function (): void {
         Http::fake();
 
         $user = User::factory()->create(['email' => 'user@example.com']);
@@ -149,12 +137,13 @@ describe('sync', function (): void {
 
         $response = postJson('/api/sync-user', [
             'email' => 'user@example.com',
-            'password_hash' => 'new_hashed_password',
+            'password' => 'new_password',
         ], ['Authorization' => 'Bearer test-api-key']);
 
         $response->assertOk();
 
         $user->refresh();
         expect($user->password)->not->toBe($oldPassword);
+        expect(Hash::check('new_password', $user->password))->toBeTrue();
     });
 });

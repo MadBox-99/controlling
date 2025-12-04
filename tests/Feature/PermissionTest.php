@@ -44,7 +44,7 @@ it('creates all required permissions', function (): void {
 });
 
 it('assigns all permissions to admin role', function (): void {
-    $adminRole = Role::findByName('admin', 'web');
+    $adminRole = Role::findByName('Admin', 'web');
 
     expect($adminRole->permissions->count())->toBeGreaterThan(0);
     expect($adminRole->hasPermissionTo('create teams'))->toBeTrue();
@@ -63,7 +63,7 @@ it('assigns limited permissions to subscriber role', function (): void {
 
 it('allows admin users to have all permissions', function (): void {
     $admin = User::factory()->create();
-    $admin->assignRole('admin');
+    $admin->assignRole('Admin');
 
     actingAs($admin);
 
@@ -98,7 +98,7 @@ it('allows direct permission assignment to users', function (): void {
 
 it('allows checking multiple permissions at once', function (): void {
     $admin = User::factory()->create();
-    $admin->assignRole('admin');
+    $admin->assignRole('Admin');
 
     actingAs($admin);
 
