@@ -10,8 +10,10 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 final class TeamController extends Controller
 {
@@ -29,7 +31,9 @@ final class TeamController extends Controller
         if (isset($validated['user_email'])) {
             $user = User::query()->where('email', $validated['user_email'])->firstOrCreate([
                 'email' => $validated['user_email'],
+            ], [
                 'name' => $validated['user_name'],
+                'password' => Hash::make(Str::random(16)), // Random password
             ]);
             if ($user) {
                 $user->teams()->attach($team);
