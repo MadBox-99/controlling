@@ -11,6 +11,7 @@ Route::middleware('api.key')->group(function (): void {
     Route::post('/create-user', [UserSyncController::class, 'create']);
     Route::post('/sync-user', [UserSyncController::class, 'sync']);
     Route::post('/create-team', [TeamController::class, 'create']);
+    Route::post('/toggle-user-active', [UserSyncController::class, 'toggleActive']);
     Route::get('/user-teams', [TeamController::class, 'getUserTeams']);
     Route::post('/sync-password', SyncPasswordController::class);
 });

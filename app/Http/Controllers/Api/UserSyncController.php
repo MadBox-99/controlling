@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 
 final class UserSyncController extends Controller
 {
@@ -75,5 +76,18 @@ final class UserSyncController extends Controller
         }
 
         return response()->json(['message' => 'User synced successfully']);
+    }
+
+    public function toggleActive(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'email', 'exists:users,email'],
+            'is_active' => ['required', 'boolean'],
+        ]);
+
+        User::where('email', $validated['email'])
+            ->update(['is_active' => $validated['is_active']]);
+
+        return response()->json(['message' => 'User updated']);
     }
 }
