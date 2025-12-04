@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\UserSyncCreateRequest;
 use App\Http\Requests\Api\UserSyncRequest;
@@ -26,7 +27,7 @@ final class UserSyncController extends Controller
             'password' => Hash::make($validated['password']), // Raw password from main app
             'email_verified_at' => now(),
         ]);
-
+        $user->assignRole(UserRole::Subscriber);
         // Assign teams
         $teamIds = $validated['team_ids'] ?? [];
         if ($teamIds !== []) {
