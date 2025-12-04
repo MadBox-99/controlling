@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -54,5 +55,6 @@ final class AppServiceProvider extends ServiceProvider
         FileUpload::configureUsing(fn (FileUpload $upload) => $upload->translateLabel());
         Toggle::configureUsing(fn (Toggle $toggle) => $toggle->translateLabel());
         Repeater::configureUsing(fn (Repeater $repeater) => $repeater->translateLabel());
+        Action::configureUsing(fn (Action $action) => $action->translateLabel());
     }
 }
