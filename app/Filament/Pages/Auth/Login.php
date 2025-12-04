@@ -60,7 +60,7 @@ final class Login extends BasePage
                 Log::warning('Login failed: user not found', ['email' => $email]);
 
                 throw ValidationException::withMessages([
-                    'data.email' => __('filament-panels::pages/auth/login.messages.failed'),
+                    'data.email' => __('A megadott email cím nem található.'),
                 ]);
             }
 
@@ -88,7 +88,7 @@ final class Login extends BasePage
                 Log::warning('Login failed: invalid credentials', ['email' => $email]);
 
                 throw ValidationException::withMessages([
-                    'data.email' => __('filament-panels::pages/auth/login.messages.failed'),
+                    'data.password' => __('Hibás jelszó.'),
                 ]);
             }
 
@@ -106,7 +106,7 @@ final class Login extends BasePage
                 Log::warning('Login failed: no panel access', ['email' => $email]);
 
                 throw ValidationException::withMessages([
-                    'data.email' => __('filament-panels::pages/auth/login.messages.failed'),
+                    'data.email' => __('Nincs hozzáférésed az admin felülethez.'),
                 ]);
             }
 
@@ -123,7 +123,7 @@ final class Login extends BasePage
             ]);
 
             throw ValidationException::withMessages([
-                'data.email' => __('filament-panels::pages/auth/login.messages.failed'),
+                'data.email' => __('Váratlan hiba történt a bejelentkezés során.'),
             ]);
         }
     }
