@@ -37,6 +37,7 @@ final class AdminPanelServiceProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
+            ->emailVerification()
             ->profile(null)
             ->userMenuItems([
                 'profile' => Action::make('profile')
